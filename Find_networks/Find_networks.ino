@@ -4,6 +4,7 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.disconnect(); // Disconnect from any previously connected network
+  
   delay(1000); // Wait for the module to disconnect
 
   Serial.println("Scanning for available networks:");
@@ -21,5 +22,5 @@ void setup() {
 }
 
 void loop() {
-  // Your other code here
+  
 }
