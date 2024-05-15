@@ -6,7 +6,7 @@ const char* password = "hotspot4Grant";
 void setup() {
    // Start serial
   Serial.begin(115200);
-  delay(10);
+  delay(100);
 
   // Connecting to a WiFi network
   Serial.println();
