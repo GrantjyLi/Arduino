@@ -1,12 +1,13 @@
 #include<ESP8266WiFi.h>
 #include<ESP8266WebServer.h>
 
-const char* ssid = "cheese";
-const char* password = "pw4esp";
 const char defaultPort = 80;
 
-IPAddress local_ip(192,168,1,1);
-IPAddress gateway(192,168,1,1);
+const char* ssid = "notESP8266";
+const char* pw = "pw4ESP8266";
+
+IPAddress local_IP(192,168,4,22);
+IPAddress gateway(192,168,4,9);
 IPAddress subnet(255,255,255,0);
 
 ESP8266WebServer server(defaultPort);
@@ -16,8 +17,8 @@ void setup(){
     delay(100);
 
     //setup soft access point
-    WiFi.softAPConfig(local_ip, gateway, subnet);
-    WiFi.softAP(ssid, password,1, false, 4);
+    WiFi.softAPConfig(local_IP, gateway, subnet);
+    WiFi.softAP(ssid, pw,1, false, 4);
     delay(100);
 
     //.on() accepts a URL path and function to handle it
@@ -25,6 +26,7 @@ void setup(){
     //server.onNotFound(handleNotFound);
 
     server.begin();
+    
     Serial.println("HTTP server started");
     Serial.printf("IP Address: ");
     Serial.println(WiFi.softAPIP());
