@@ -23,6 +23,7 @@ void setup(){
 
     //.on() accepts a URL path and function to handle it
     server.on("/", handleOnConnect);
+    server.on("/submit", HTTP_POST, handleSubmit);
     //server.onNotFound(handleNotFound);
 
     server.begin();
@@ -37,15 +38,49 @@ void loop(){
     server.handleClient();
 }
 
-
 //when a device connects
 void handleOnConnect(){
     Serial.println("Device connected.");
-    server.send(200, "text/html", sendHTMLForm());
+    sendHTML();
+
 }
 
-String sendHTMLForm(){
-    String html = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width\", initial-scale=1.0><style>*{color: Black;size: 20px;}</style></head><body><div id =\"mainContainer\"><h1>Hi friend, try edit me!</h1><form id = \"inputForm\"><label for=\"passwordEnter\">Password: (30 characters max)</label><br><input type=\"text\" id=\"passwordEnter\" name=\"fname\"><br><br><input type=\"submit\" value=\"Enter\"></form></div></body></html>";
+void handleSubmit(){
+
+    if (server.hasArg("passwordEnter")) {
+        String userPW = server.arg("passwordEnter");
+        Serial.print("password entered: ");
+        Serial.println(userPW);
+    }else{
+        Serial.println("No password entered.");
+    }
+    sendHTML();
+}
+
+void sendHTML(){
+    server.send(200, "text/html", getHTMLForm());
+}
+
+String getHTMLForm(){
+    String html = 
+R"rawliteral(<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width", initial-scale=1.0>
+		<style>*{color: Black;size: 20px;}</style>
+	</head>
+	<body>
+		<div id ="mainContainer">
+			<h1>Hi friend, try edit me!</h1>
+			<form id = "inputForm" action = "\submit" method = "post">
+				<label for="passwordEnter">Password: (30 characters max)</label><br>
+				<input type="text" class="inputBar" name="passwordEnter"><br><br>
+				<input type="submit" value="Enter">
+			</form>
+		</div>
+	</body>
+</html>)rawliteral";
 
     return html;
 }
