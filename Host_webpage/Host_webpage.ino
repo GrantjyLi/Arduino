@@ -28,7 +28,7 @@ void setup(){
 
     server.begin();
     
-    Serial.println("HTTP server started");
+    Serial.println("\nHTTP server started");
     Serial.printf("IP Address: ");
     Serial.println(WiFi.softAPIP());
 
@@ -36,11 +36,13 @@ void setup(){
 
 void loop(){
     server.handleClient();
+    delay(1000);
+    Serial.printf("Stations connected to soft-AP = %d\n", WiFi.softAPgetStationNum());
 }
 
 //when a device connects
 void handleOnConnect(){
-    Serial.println("Device connected.");
+    Serial.println("Webpage visited connected.");
     sendHTML();
 
 }
