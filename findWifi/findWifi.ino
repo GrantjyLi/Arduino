@@ -7,6 +7,7 @@ String knownSSIDs[NUMSSID];
 
 void setup() {
   Serial.begin(115200);
+  Serial.flush();
   WiFi.mode(WIFI_STA);
   WiFi.disconnect(); // Disconnect from any previously connected network
   
@@ -33,7 +34,10 @@ void setup() {
 
 void loop(){
   delay(5000);
+  findNewNetworks();
+}
 
+void findNewNetworks(){
   uint8_t newNumNetworks = WiFi.scanNetworks();
 
   for (uint8_t i = 0; i < newNumNetworks; i++){
