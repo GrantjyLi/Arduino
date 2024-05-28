@@ -21,15 +21,10 @@ void setup() {
 
     Serial.begin(115200);
     Serial.flush();
-    test();
 
 }
 
-void printInstruction(){
-    Serial.println("\nEnter 1 to refresh for networks.");
-    Serial.println("Enter 2 to mimic a found network SSID.");
-    Serial.println("Enter 3 to create a unique network SSID.\n");
-}
+
 
 void loop(){
     delay(5000);
@@ -105,15 +100,6 @@ void printAllNetwork(){
         printNetwork(WiFi.SSID(i), WiFi.RSSI(i), i);
     }
     
-}
-
-void printNetwork(String SSID, uint8_t strength, uint8_t numNetwork){
-    Serial.println("--------------------------");
-    Serial.printf("Network #: %d\n", numNetwork);
-    Serial.print("SSID: ");
-    Serial.println(SSID);
-    Serial.print("Strength: ");
-    Serial.println(strength);
 }
 
 String getSSIDInput(){
