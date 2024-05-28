@@ -1,4 +1,7 @@
 #include <ESP8266WiFi.h>
+#include "View.h"
+
+using namespace View;
 
 #define MAXSSIDS 50
 
@@ -18,7 +21,7 @@ void setup() {
 
     Serial.begin(115200);
     Serial.flush();
-    printInstruction();
+    test();
 
 }
 
@@ -30,6 +33,7 @@ void printInstruction(){
 
 void loop(){
     delay(5000);
+    printInstruction();
     while (!Serial.available()) {
         // Wait for user input
     }
