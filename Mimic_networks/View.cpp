@@ -15,4 +15,16 @@ namespace View {
         Serial.print("Strength: ");
         Serial.println(strength);
     }
+    
+    void getInput(String& input){
+    Serial.println("Enter ");
+        if (Serial.available() > 0) {
+
+            String shit = Serial.readString();// read the incoming data as string
+
+            Serial.println(shit);
+
+        }
+    Serial.println("done ");
+    }
 }

@@ -22,12 +22,20 @@ void setup() {
     Serial.begin(115200);
     Serial.flush();
 
+    
 }
 
 
-
 void loop(){
-    delay(5000);
+    String test;
+    if (Serial.available() > 0) {
+
+            String shit = Serial.readString();// read the incoming data as string
+
+            Serial.println(shit);
+    }
+    //Serial.println(test);
+
     printInstruction();
     while (!Serial.available()) {
         // Wait for user input
@@ -49,6 +57,7 @@ void loop(){
             printInstruction();
             break;
     }
+    delay(5000);
 }
 
 void findNewNetworks(){
