@@ -17,14 +17,11 @@ namespace View {
     }
     
     void getInput(String& input){
-    Serial.println("Enter ");
         if (Serial.available() > 0) {
 
-            String shit = Serial.readString();// read the incoming data as string
-
-            Serial.println(shit);
+            input = Serial.readStringUntil('\n');// read the incoming data as string
 
         }
-    Serial.println("done ");
+        delay(100);
     }
 }

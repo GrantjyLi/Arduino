@@ -27,19 +27,12 @@ void setup() {
 
 
 void loop(){
-    String test;
-    if (Serial.available() > 0) {
-
-            String shit = Serial.readString();// read the incoming data as string
-
-            Serial.println(shit);
-    }
-    //Serial.println(test);
 
     printInstruction();
     while (!Serial.available()) {
         // Wait for user input
     }
+    String inputSSID;
 
     char input = Serial.read();
     switch (input){
@@ -50,7 +43,9 @@ void loop(){
             MimicNetwork();
             break;
         case '3':
-            createUniqueAP(getSSIDInput());
+            Serial.print("Enter custom SSID: ");
+            getInput(inputSSID);
+            createUniqueAP(inputSSID);
             break;
         default:
             Serial.println("Enter a Valid Answer: ");
@@ -109,19 +104,4 @@ void printAllNetwork(){
         printNetwork(WiFi.SSID(i), WiFi.RSSI(i), i);
     }
     
-}
-
-String getSSIDInput(){
-    String inputString = "";
-    while (Serial.available()) {
-        char inChar = (char)Serial.read();
-
-        inputString += inChar;
-
-        if (inChar == '\n') {
-            inputString.trim();
-            break;
-        }
-    }
-    return inputString;
 }
