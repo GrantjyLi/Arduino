@@ -52,6 +52,15 @@ void loop(){
             printInstruction();
             break;
     }
+    
+    Serial.print("\nContinue (Y/N): ");
+    while (!Serial.available()){}
+    input = Serial.read();
+
+    if(input != 'y' && input != 'Y'){
+        return;
+    }
+
     delay(5000);
 }
 
@@ -95,6 +104,7 @@ void MimicNetwork(){
 }
 
 void createUniqueAP(String SSID){
+    Serial.println(SSID);
     WiFi.softAPConfig(local_IP, gateway, subnet);
     WiFi.softAP(SSID);
 }
