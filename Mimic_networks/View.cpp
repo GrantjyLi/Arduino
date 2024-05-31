@@ -17,11 +17,8 @@ namespace View {
     }
     
     void getInput(String& input){
-        if (Serial.available() > 0) {
-
-            input = Serial.readStringUntil('\n');// read the incoming data as string
-
-        }
+        while (!Serial.available()){}
+        input = Serial.readStringUntil('\n');// read the incoming data as string
         delay(100);
     }
 }

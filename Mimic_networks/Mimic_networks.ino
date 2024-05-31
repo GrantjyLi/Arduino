@@ -45,23 +45,19 @@ void loop(){
         case '3':
             Serial.print("Enter custom SSID: ");
             getInput(inputSSID);
-            createUniqueAP(inputSSID);
+
+            Serial.println(inputSSID);
+            WiFi.softAPConfig(local_IP, gateway, subnet);
+            WiFi.softAP(inputSSID);
+
             break;
         default:
             Serial.println("Enter a Valid Answer: ");
             printInstruction();
             break;
     }
-    
-    Serial.print("\nContinue (Y/N): ");
-    while (!Serial.available()){}
-    input = Serial.read();
 
-    if(input != 'y' && input != 'Y'){
-        return;
-    }
-
-    delay(5000);
+    delay(2000);
 }
 
 void findNewNetworks(){
@@ -104,9 +100,9 @@ void MimicNetwork(){
 }
 
 void createUniqueAP(String SSID){
-    Serial.println(SSID);
-    WiFi.softAPConfig(local_IP, gateway, subnet);
-    WiFi.softAP(SSID);
+    // Serial.println(SSID);
+    // WiFi.softAPConfig(local_IP, gateway, subnet);
+    // WiFi.softAP(SSID);
 }
 
 void printAllNetwork(){
