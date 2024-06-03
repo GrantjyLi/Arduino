@@ -44,7 +44,7 @@ void loop(){
             break;
         case '3':
             Serial.print("Enter custom SSID: ");
-            getInput(inputSSID);
+            getStrInput(inputSSID);
             createUniqueAP(inputSSID);
             break;
         default:
@@ -84,10 +84,12 @@ void MimicNetwork(){
     Serial.println("Which network # to mimic: ");
     printAllNetwork();
 
-    char input = Serial.read();
+    uint8_t networkNum;
+    getIntInput(networkNum);
+    Serial.println(networkNum);
 
-    if(input >= 0 && input < numNetworks){
-        createUniqueAP(knownSSIDs[input]);
+    if(networkNum >= 0 && networkNum < numNetworks){
+        createUniqueAP(knownSSIDs[networkNum]);
     }else{
         Serial.println("Invalid network number.");
     }

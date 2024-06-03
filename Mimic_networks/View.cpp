@@ -16,9 +16,15 @@ namespace View {
         Serial.println(strength);
     }
     
-    void getInput(String& input){
+    void getStrInput(String& input){
         while (!Serial.available()){}
         input = Serial.readStringUntil('\n');// read the incoming data as string
+        delay(100);
+    }
+
+    void getIntInput(uint8_t& input){
+        while (!Serial.available()){}
+        input = Serial.parseInt();
         delay(100);
     }
 }
