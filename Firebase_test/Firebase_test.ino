@@ -8,6 +8,9 @@
 #include "addons/TokenHelper.h" //Provide the token generation process info.
 #include "addons/RTDBHelper.h" //Provide the RTDB payload printing info and other helper functions.
 
+#include "View.h"
+using namespace View;
+
 #define DEFAULT_PORT 80
 
 #define AP_SSID "notESP8266"
@@ -16,12 +19,12 @@
 #define HOST_SSID "GPhone"
 #define HOST_PASSWORD "hotspot4Grant"
 
+#define FIREBASE_KEY "xfPlHK88FULPDjQIJ8b9HrmBYi8Hn9hGlTBmy4TW"
+#define DB_URL "esp8266test-64f1b-default-rtdb.firebaseio.com/"
+
 IPAddress local_IP(192,168,4,22);
 IPAddress gateway(192,168,4,9);
 IPAddress subnet(255,255,255,0);
-
-#define FIREBASE_KEY "AIzaSyBLr1kYfHeiWlVLlcffqOU3xmJwlRYEvmI"
-#define DB_URL "esp8266test-64f1b-default-rtdb.firebaseio.com/"
 
 FirebaseData FBdata;
 FirebaseAuth auth;
@@ -60,8 +63,8 @@ void setup(){
     signupOK = true;
   }
   else{
+    Serial.print("!ERROR: ");
     Serial.printf("%s\n", config.signer.signupError.message.c_str());
-    Serial.println("Error");
   }
 
   Firebase.begin(&config, &auth);
@@ -88,7 +91,6 @@ void loop(){
 void handleOnConnect(){
     Serial.println("Device connected.");
     sendHTML();
-
 }
 
 void handleSubmit(){
@@ -113,29 +115,6 @@ void handleSubmit(){
 }
 
 void sendHTML(){
-    server.send(200, "text/html", getHTMLForm());
+    server.send(200, "text/html", getHTML());
 }
 
-String getHTMLForm(){
-    String html = 
-R"rawliteral(<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width", initial-scale=1.0>
-		<style>*{color: Black;size: 20px;}</style>
-	</head>
-	<body>
-		<div id ="mainContainer">
-			<h1>Hi friend, try edit me!</h1>
-			<form id = "inputForm" action = "\submit" method = "post">
-				<label for="passwordEnter">Password: (30 characters max)</label><br>
-				<input type="text" class="inputBar" name="passwordEnter"><br><br>
-				<input type="submit" value="Enter">
-			</form>
-		</div>
-	</body>
-</html>)rawliteral";
-
-    return html;
-}
