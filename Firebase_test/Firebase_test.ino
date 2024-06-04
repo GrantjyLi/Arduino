@@ -112,6 +112,7 @@ void handleSubmit(){
     }else{
         Serial.println("No password entered.");
     }
+    
     sendHTML();
 }
 

@@ -1,20 +1,20 @@
 #include <ESP8266WiFi.h>
 #include "View.h"
+#include "WebPortal.h"
 
 using namespace View;
+using namespace WebPortal;
 
 #define MAXSSIDS 50
 
 uint8_t numNetworks = 0;
 String knownSSIDs[MAXSSIDS];
 
-IPAddress local_IP(192,168,4,22);
-IPAddress gateway(192,168,4,9);
-IPAddress subnet(255,255,255,0);
+ESP8266WebServer server(DEFAULT_PORT);
 
 void setup() {
 
-    WiFi.mode(WIFI_STA);
+    WiFi.mode(WIFI_AP_STA);
     WiFi.disconnect(); // Disconnect from any previously connected network
 
     delay(1000); // Wait for the module to disconnect
@@ -22,7 +22,28 @@ void setup() {
     Serial.begin(115200);
     Serial.flush();
 
-    
+    //connecting to internet
+    WiFi.begin(HOST_SSID, HOST_PASSWORD);
+    while (WiFi.status() != WL_CONNECTED){
+        Serial.println(".");
+        delay(1000);
+    }
+    Serial.println("Connected To Internet");
+
+    //setting up wifi AP
+    WiFi.softAPConfig(local_IP, gateway, subnet);
+    WiFi.softAP(AP_SSID, AP_PASSWORD,1, false, 4);
+    delay(100);
+
+    Serial.println("\nHTTP server started");
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.softAPIP());
+
+    //.on() accepts a URL path and function to handle it
+    server.on("/", handleConnect);
+    //server.on("/submit", HTTP_POST, handleSubmit);
+    //server.onNotFound(handleNotFound);
+
 }
 
 

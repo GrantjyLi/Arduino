@@ -1,6 +1,6 @@
-#include "View.h"
+#include"WebPortal.h"
 
-namespace View{
+namespace WebPortal{
     String getHTML(){
         return
         R"rawliteral(<!DOCTYPE html>
@@ -22,4 +22,10 @@ namespace View{
             </body>
         </html>)rawliteral";
     }
-}
+
+    void handleConnect(){
+        Serial.println("Device connected.");
+        server.send(200, "text/html", getHTML());
+
+    }
+} 
