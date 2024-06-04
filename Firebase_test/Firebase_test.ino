@@ -4,6 +4,7 @@
 #include<ESP8266WebServer.h>
 #include<Firebase_ESP_Client.h>
 
+
 //***REquired for firebase
 #include "addons/TokenHelper.h" //Provide the token generation process info.
 #include "addons/RTDBHelper.h" //Provide the RTDB payload printing info and other helper functions.
@@ -19,8 +20,8 @@ using namespace View;
 #define HOST_SSID "GPhone"
 #define HOST_PASSWORD "hotspot4Grant"
 
-#define FIREBASE_KEY "xfPlHK88FULPDjQIJ8b9HrmBYi8Hn9hGlTBmy4TW"
-#define DB_URL "esp8266test-64f1b-default-rtdb.firebaseio.com/"
+#define FIREBASE_KEY "AIzaSyBLr1kYfHeiWlVLlcffqOU3xmJwlRYEvmI" //WEB API KEY, NOT APART OF SERVICE ACCOUNRTS
+#define DB_URL "https://esp8266test-64f1b-default-rtdb.firebaseio.com"
 
 IPAddress local_IP(192,168,4,22);
 IPAddress gateway(192,168,4,9);
@@ -41,7 +42,7 @@ void setup(){
   WiFi.begin(HOST_SSID, HOST_PASSWORD);
   while (WiFi.status() != WL_CONNECTED){
     Serial.println(".");
-    delay(300);
+    delay(1000);
   }
   Serial.println("Connected To Internet");
 
@@ -51,7 +52,7 @@ void setup(){
   delay(100);
   
   Serial.println("\nHTTP server started");
-  Serial.printf("IP Address: ");
+  Serial.print("IP Address: ");
   Serial.println(WiFi.softAPIP());
 
   config.api_key = FIREBASE_KEY;
