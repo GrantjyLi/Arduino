@@ -24,7 +24,7 @@ namespace WebPortal{
     }
 
     void handleConnect(){
-        Serial.println("Device connected.");
+        Serial.println("Page Visited.");
         server.send(200, "text/html", getHTML());
 
     }

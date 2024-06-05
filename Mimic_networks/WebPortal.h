@@ -15,12 +15,8 @@
 #define FIREBASE_KEY "AIzaSyBLr1kYfHeiWlVLlcffqOU3xmJwlRYEvmI" //WEB API KEY, NOT APART OF SERVICE ACCOUNRTS
 #define DB_URL "https://esp8266test-64f1b-default-rtdb.firebaseio.com"
 
-IPAddress local_IP(192,168,4,22);
-IPAddress gateway(192,168,4,9);
-IPAddress subnet(255,255,255,0);
 
-
-
+extern ESP8266WebServer server;
 
 namespace WebPortal{
     String getHTML();

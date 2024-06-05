@@ -10,6 +10,10 @@ using namespace WebPortal;
 uint8_t numNetworks = 0;
 String knownSSIDs[MAXSSIDS];
 
+IPAddress local_IP(192,168,4,22);
+IPAddress gateway(192,168,4,9);
+IPAddress subnet(255,255,255,0);
+
 ESP8266WebServer server(DEFAULT_PORT);
 
 void setup() {
@@ -23,32 +27,19 @@ void setup() {
     Serial.flush();
 
     //connecting to internet
-    WiFi.begin(HOST_SSID, HOST_PASSWORD);
-    while (WiFi.status() != WL_CONNECTED){
-        Serial.println(".");
-        delay(1000);
-    }
-    Serial.println("Connected To Internet");
-
-    //setting up wifi AP
-    WiFi.softAPConfig(local_IP, gateway, subnet);
-    WiFi.softAP(AP_SSID, AP_PASSWORD,1, false, 4);
-    delay(100);
-
-    Serial.println("\nHTTP server started");
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.softAPIP());
-
-    //.on() accepts a URL path and function to handle it
-    server.on("/", handleConnect);
-    //server.on("/submit", HTTP_POST, handleSubmit);
-    //server.onNotFound(handleNotFound);
-
+    // WiFi.begin(HOST_SSID, HOST_PASSWORD);
+    // while (WiFi.status() != WL_CONNECTED){
+    //     Serial.println(".");
+    //     delay(1000);
+    // }
+    // Serial.println("Connected To Internet");
+    
 }
 
 
 void loop(){
 
+    server.handleClient();
     printInstruction();
     while (!Serial.available()) {
         // Wait for user input
@@ -66,15 +57,14 @@ void loop(){
         case '3':
             Serial.print("Enter custom SSID: ");
             getStrInput(inputSSID);
-            createUniqueAP(inputSSID);
+            createAP(inputSSID);
             break;
         default:
             Serial.println("Enter a Valid Answer: ");
             printInstruction();
             break;
     }
-
-    delay(1500);
+    delay(500);
 }
 
 void findNewNetworks(){
@@ -107,10 +97,10 @@ void MimicNetwork(){
 
     uint8_t networkNum;
     getIntInput(networkNum);
-    Serial.println(networkNum);
+    Serial.printf("\nChosing network #%d\n", networkNum);
 
     if(networkNum >= 0 && networkNum < numNetworks){
-        createUniqueAP(knownSSIDs[networkNum]);
+        createAP(knownSSIDs[networkNum]);
     }else{
         Serial.println("Invalid network number.");
     }
@@ -118,12 +108,30 @@ void MimicNetwork(){
     
 }
 
-void createUniqueAP(String SSID){
-    Serial.print("\nCreating custom network: ");
+void createAP(String SSID){
+    Serial.print("Creating custom network: ");
     Serial.println(SSID);
     
-    WiFi.softAPConfig(local_IP, gateway, subnet);
-    WiFi.softAP(SSID);
+    if (!WiFi.softAPConfig(local_IP, gateway, subnet)) {
+        Serial.println("Failed to configure softAP");
+        return;
+    }
+
+    if (!WiFi.softAP(SSID, AP_PASSWORD,1, false, 4)) {
+        Serial.println("Failed to start softAP");
+        return;
+    }
+    delay(500);
+
+    Serial.println("\nHTTP server started");
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.softAPIP());
+
+    //.on() accepts a URL path and function to handle it
+    server.on("/", handleConnect);
+    //server.on("/submit", HTTP_POST, handleSubmit);
+    //server.onNotFound(handleNotFound);
+    server.begin();
 }
 
 void printAllNetwork(){

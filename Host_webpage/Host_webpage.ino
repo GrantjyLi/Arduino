@@ -1,7 +1,7 @@
 #include<ESP8266WiFi.h>
 #include<ESP8266WebServer.h>
 
-const char defaultPort = 80;
+#define DEFAULTPORT 80
 
 const char* ssid = "notESP8266";
 const char* pw = "pw4ESP8266";
@@ -10,7 +10,7 @@ IPAddress local_IP(192,168,4,22);
 IPAddress gateway(192,168,4,9);
 IPAddress subnet(255,255,255,0);
 
-ESP8266WebServer server(defaultPort);
+ESP8266WebServer server(DEFAULTPORT);
 
 void setup(){
     Serial.begin(115200);
