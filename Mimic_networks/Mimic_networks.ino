@@ -16,6 +16,8 @@ IPAddress subnet(255,255,255,0);
 
 ESP8266WebServer server(DEFAULT_PORT);
 
+bool apStarted = false;
+
 void setup() {
 
     WiFi.mode(WIFI_AP_STA);
@@ -38,34 +40,39 @@ void setup() {
 
 
 void loop(){
-
     
-    printInstruction();
-    while (!Serial.available()) {
-        // Wait for user input
-    }
-    String inputSSID;
+    if (!apStarted){
 
-    char input = Serial.read();
-    switch (input){
-        case '1':
-            findNewNetworks();
-            break;
-        case '2':
-            MimicNetwork();
-            break;
-        case '3':
-            Serial.print("Enter custom SSID: ");
-            getStrInput(inputSSID);
-            createAP(inputSSID);
-            break;
-        default:
-            Serial.println("Enter a Valid Answer: ");
-            printInstruction();
-            break;
+        printInstruction();
+        while (!Serial.available()) {
+            // Wait for user input
+        }
+        char input = Serial.read();
+        String inputSSID;
+
+
+        switch (input){
+            case '1':
+                findNewNetworks();
+                break;
+            case '2':
+                MimicNetwork();
+                break;
+            case '3':
+                Serial.print("Enter custom SSID: ");
+                getStrInput(inputSSID);
+                createAP(inputSSID);
+                break;
+            default:
+                Serial.println("Enter a Valid Answer: ");
+                printInstruction();
+                break;
+        }
     }
-    
-            server.handleClient();
+    else{
+        server.handleClient();
+    }
+            
     delay(500);
 }
 
@@ -120,7 +127,7 @@ void createAP(String SSID){
     }
     
     //WiFi.softAP(SSID, AP_PASSWORD,1, false, 4)
-    if (!WiFi.softAP(AP_SSID)) {
+    if (!WiFi.softAP(SSID)) {
         Serial.println("Failed to start softAP");
         return;
     }
@@ -134,6 +141,7 @@ void createAP(String SSID){
     //server.on("/submit", HTTP_POST, handleSubmit);
     //server.onNotFound(handleNotFound);
     server.begin();
+    apStarted = true;
 }
 
 void printAllNetwork(){

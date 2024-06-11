@@ -5,6 +5,8 @@ namespace View {
         Serial.println("\nEnter 1 to refresh for networks.");
         Serial.println("Enter 2 to mimic a found network SSID.");
         Serial.println("Enter 3 to create a unique network SSID.\n");
+
+        Serial.print("\nEnter choice: ");
     }
 
     void printNetwork(String SSID, uint8_t strength, uint8_t numNetwork){
