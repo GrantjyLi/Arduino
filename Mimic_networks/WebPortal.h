@@ -19,8 +19,9 @@
 extern ESP8266WebServer server;
 
 namespace WebPortal{
-    //String getHTML();
-    //void handleConnect();
+    String getHTML(String&);
+    void handleConnect();
+    void handleSubmit();
 }
 
 #endif
