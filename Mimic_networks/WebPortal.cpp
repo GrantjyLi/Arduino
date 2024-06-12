@@ -1,7 +1,7 @@
 #include"WebPortal.h"
 
 namespace WebPortal{
-    String getHTML(String& SSID){
+    String getHTML(){
         String HTMLTemplate = 
         R"rawliteral(<!DOCTYPE html>
         <html lang="en">
@@ -21,7 +21,7 @@ namespace WebPortal{
             </head>
             <body>
                 <div id ="mainContainer">
-                    <h1>Hi friend, try edit me!</h1>
+                    <h1>Loggin on to {{SSID}}</h1>
                     <form id = "inputForm" action = "\submit" method = "post">
                         <label for="ssidInput">Wifi Network SSID:</label><br>
                         <input type="text" placeholder = "{{SSID}}"><br><br>

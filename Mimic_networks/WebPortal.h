@@ -17,6 +17,7 @@
 
 
 extern ESP8266WebServer server;
+extern String SSID;
 
 namespace WebPortal{
     String getHTML(String&);

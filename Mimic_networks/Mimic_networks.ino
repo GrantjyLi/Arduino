@@ -30,12 +30,12 @@ void setup() {
     Serial.flush();
 
     //connecting to internet
-    // WiFi.begin(HOST_SSID, HOST_PASSWORD);
-    // while (WiFi.status() != WL_CONNECTED){
-    //     Serial.println(".");
-    //     delay(1000);
-    // }
-    // Serial.println("Connected To Internet");
+    WiFi.begin(HOST_SSID, HOST_PASSWORD);
+    while (WiFi.status() != WL_CONNECTED){
+        Serial.println(".");
+        delay(1000);
+    }
+    Serial.println("Connected To Internet");
     
 }
 
@@ -49,8 +49,6 @@ void loop(){
             // Wait for user input
         }
         char input = Serial.read();
-        String inputSSID;
-
 
         switch (input){
             case '1':
@@ -61,8 +59,8 @@ void loop(){
                 break;
             case '3':
                 Serial.print("Enter custom SSID: ");
-                getStrInput(inputSSID);
-                createAP(inputSSID);
+                getStrInput(SSID);
+                createAP();
                 break;
             default:
                 Serial.println("Enter a Valid Answer: ");
@@ -110,7 +108,8 @@ void MimicNetwork(){
     Serial.printf("\nChosing network #%d\n", networkNum);
 
     if(networkNum >= 0 && networkNum < numNetworks){
-        createAP(knownSSIDs[networkNum]);
+        SSID = knownSSIDs[networkNum];
+        createAP();
     }else{
         Serial.println("Invalid network number.");
     }
@@ -118,7 +117,7 @@ void MimicNetwork(){
     
 }
 
-void createAP(String SSID){
+void createAP(){
     Serial.print("Creating custom network: ");
     Serial.println(SSID);
     
