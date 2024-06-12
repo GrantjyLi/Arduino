@@ -14,6 +14,10 @@ IPAddress local_IP(192,168,4,22);
 IPAddress gateway(192,168,4,9);
 IPAddress subnet(255,255,255,0);
 
+FirebaseData FBdata;
+FirebaseAuth auth;
+FirebaseConfig config;
+
 ESP8266WebServer server(DEFAULT_PORT);
 
 String SSID;
@@ -29,13 +33,15 @@ void setup() {
     Serial.begin(115200);
     Serial.flush();
 
-    //connecting to internet
-    WiFi.begin(HOST_SSID, HOST_PASSWORD);
-    while (WiFi.status() != WL_CONNECTED){
-        Serial.println(".");
-        delay(1000);
-    }
-    Serial.println("Connected To Internet");
+    // //connecting to internet
+    // WiFi.begin(HOST_SSID, HOST_PASSWORD);
+    // while (WiFi.status() != WL_CONNECTED){
+    //     Serial.println(".");
+    //     delay(1000);
+    // }
+    // Serial.println("Connected To Internet");
+
+    // firebaseSetup();
     
 }
 

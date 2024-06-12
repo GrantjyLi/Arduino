@@ -1,3 +1,5 @@
+//to communicate to user using Serial terminal
+
 #ifndef VIEW_H
 #define VIEW_H
 

