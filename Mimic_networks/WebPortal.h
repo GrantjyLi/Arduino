@@ -4,9 +4,11 @@
 #define WEBPORTAL_H
 
 #include<ESP8266WebServer.h>
+#include <DNSServer.h>
 #include<Firebase_ESP_Client.h>
 
 #define DEFAULT_PORT 80
+#define DNS_PORT 53
 
 #define AP_SSID "notESP8266"
 #define AP_PASSWORD "pw4ESP8266"
