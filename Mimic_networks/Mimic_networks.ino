@@ -1,9 +1,11 @@
 #include <ESP8266WiFi.h>
 #include "View.h"
 #include "WebPortal.h"
+#include "FirebaseCom.h"
 
 using namespace View;
 using namespace WebPortal;
+using namespace FirebaseCom;
 
 #define MAXSSIDS 50
 
@@ -33,15 +35,15 @@ void setup() {
     Serial.begin(115200);
     Serial.flush();
 
-    // //connecting to internet
-    // WiFi.begin(HOST_SSID, HOST_PASSWORD);
-    // while (WiFi.status() != WL_CONNECTED){
-    //     Serial.println(".");
-    //     delay(1000);
-    // }
-    // Serial.println("Connected To Internet");
+    //connecting to internet
+    WiFi.begin(HOST_SSID, HOST_PASSWORD);
+    while (WiFi.status() != WL_CONNECTED){
+        Serial.println(".");
+        delay(1000);
+    }
+    Serial.println("Connected To Internet");
 
-    // firebaseSetup();
+    firebaseSetup();
     
 }
 

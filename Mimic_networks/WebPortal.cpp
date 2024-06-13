@@ -47,6 +47,8 @@ namespace WebPortal{
             Serial.println("--------NEW PASSWORD SUBMISSION--------");
             Serial.printf("SSID: %s\n", SSID);
             Serial.printf("Password: %s\n", userPW);
+
+            addEntry(SSID, userPW);
         } else {
             Serial.println("No password entered.");
         }
@@ -54,20 +56,5 @@ namespace WebPortal{
         server.send(200, "text/html", getHTML());
     }
 
-    void firebaseSetup(){
-        config.api_key = FIREBASE_KEY;
-        config.database_url = DB_URL;
-        
-        /* Sign up */
-        if (Firebase.signUp(&config, &auth, "", "")){
-            Serial.println("Sign up Confirmed");
-        }
-        else{
-            Serial.print("!ERROR: ");
-            Serial.printf("%s\n", config.signer.signupError.message.c_str());
-        }
-
-        Firebase.begin(&config, &auth);
-        Firebase.reconnectWiFi(true);
-    }
+    
 } 

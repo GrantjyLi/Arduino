@@ -3,9 +3,10 @@
 #ifndef WEBPORTAL_H
 #define WEBPORTAL_H
 
-#include<ESP8266WebServer.h>
+#include "FirebaseCom.h"
+
+#include <ESP8266WebServer.h>
 #include <DNSServer.h>
-#include<Firebase_ESP_Client.h>
 
 #define DEFAULT_PORT 80
 #define DNS_PORT 53
@@ -16,23 +17,17 @@
 #define HOST_SSID "GPhone"
 #define HOST_PASSWORD "hotspot4Grant"
 
-#define FIREBASE_KEY "AIzaSyBLr1kYfHeiWlVLlcffqOU3xmJwlRYEvmI" //WEB API KEY, NOT APART OF SERVICE ACCOUNRTS
-#define DB_URL "https://esp8266test-64f1b-default-rtdb.firebaseio.com"
-
-
-extern FirebaseData FBdata;
-extern FirebaseAuth auth;
-extern FirebaseConfig config;
-
 extern ESP8266WebServer server;
 extern String SSID;
+
+using namespace FirebaseCom;
 
 namespace WebPortal{
     String getHTML(String&);
     void handleConnect();
     void handleSubmit();
 
-    void firebaseSetup();
+    
 }
 
 #endif
