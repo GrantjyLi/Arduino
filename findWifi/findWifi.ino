@@ -15,21 +15,6 @@ void setup() {
 
   Serial.println("Scanning for available networks:");
   numNetworks = WiFi.scanNetworks();
-  
-  if (numNetworks == 0) {
-    Serial.println("No networks found.");
-  } else {
-    Serial.print(numNetworks);
-    Serial.println(" networks found:");
-    for (int i = 0; i < numNetworks; i++) {
-      knownSSIDs[i] = WiFi.SSID(i);
-      Serial.println("--------------------------");
-      Serial.print("SSID: ");
-      Serial.println(WiFi.SSID(i));
-      Serial.print("Strength: ");
-      Serial.println(WiFi.RSSI(i));
-    }
-  }
 }
 
 void loop(){
@@ -55,6 +40,8 @@ void findNewNetworks(){
       Serial.println("--------------------------");
         Serial.print("SSID: ");
         Serial.println(newSSID);
+        Serial.print("MAC: ");
+        Serial.println(WiFi.BSSIDstr(i));
         Serial.print("Strength: ");
         Serial.println(WiFi.RSSI(i));
 
