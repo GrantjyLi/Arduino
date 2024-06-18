@@ -39,12 +39,10 @@ void findNewNetworks(){
     if(newNetwork){
       //network name, mac address, signal strength
       Serial.println("--------------------------");
-      Serial.print("SSID: ");
-      Serial.println(WiFi.SSID(i));
-      Serial.print("MAC: ");
-      Serial.println(WiFi.BSSIDstr(i));
-      Serial.print("Strength: ");
-      Serial.println(WiFi.RSSI(i));
+      Serial.printf("SSID: %s\n", WiFi.SSID(i).c_str());
+      Serial.printf("MAC: %s\n", WiFi.BSSIDstr(i).c_str());
+      Serial.printf("Channel: %d\n", WiFi.channel(i));
+      Serial.printf("Strength: %f\n", WiFi.RSSI(i));
 
       knownMACS[numNetworks] = newMAC;
       numNetworks++;
