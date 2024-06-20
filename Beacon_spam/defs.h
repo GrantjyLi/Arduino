@@ -1,7 +1,7 @@
 #ifndef DEFS_H
 #define DEFS_H
 
-#define NUM_NETWORKS 10
+#define NUM_BEACONS 10
 
 namespace defs{
     const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
@@ -55,7 +55,6 @@ namespace defs{
     /* 103 - 106 */ 0x00, 0x0f, 0xac, 0x02,
     /* 107 - 108 */ 0x00, 0x00
     };
-
 }
 
 #endif
