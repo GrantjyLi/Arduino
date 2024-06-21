@@ -5,10 +5,12 @@ using namespace defs;
 
 extern "C" {
     #include "user_interface.h"
+    typedef void (*freedom_outside_cb_t)(uint8 status);
+    int wifi_register_send_pkt_freedom_cb(freedom_outside_cb_t cb);
+    void wifi_unregister_send_pkt_freedom_cb(void);
     int wifi_send_pkt_freedom(uint8 *buf, int len, bool sys_seq);
 }
 
-const bool wpa2 = false;
 char emptySSID[32];
 uint8_t macAdd[6];
 uint8_t wifiChannel;
@@ -18,16 +20,18 @@ char ssid[] = "cheese\n";
 
 void setup(){
     packetSize = sizeof(beaconPacket);
-    initSSID();
+    
+    for(int i=0; i< 32; i++){
+        emptySSID[i] = ' ';
+    }
 
     Serial.begin(115200);
     Serial.println();
     
-    WiFi.mode(WIFI_OFF);
+    WiFi.mode(WIFI_OFF); // No AP or STA mode
     wifi_set_opmode(STATION_MODE);
-    wifi_promiscuous_enable(0);
 
-    if (wpa2) {
+    if (WPA2) {
         beaconPacket[34] = 0x31;
     } else {
         beaconPacket[34] = 0x21;
@@ -38,7 +42,10 @@ void setup(){
 void loop(){
 
     for(int i=0; i<NUM_BEACONS; i++){
-        randomMac();
+        
+        for(int k=0; k< 6; k++){
+            macAdd[k] = random(256);
+        }
 
         //copy fake mac address into the packet
         memcpy(&beaconPacket[10], macAdd, 6);
@@ -46,11 +53,11 @@ void loop(){
 
         //reset and write ssid into the packet
         memcpy(&beaconPacket[38], emptySSID, 32);
-        memcpy_P(&beaconPacket[38], ssid, sizeof(ssid) -1);
+        memcpy_P(&beaconPacket[38], ssid, sizeof(ssid));
 
         //switch wifi channels
-        for(int i=0; i< sizeof(channels); i++){
-            wifiChannel = channels[i];
+        for(int k=0; k< sizeof(channels); k++){
+            wifiChannel = channels[k];
             beaconPacket[82] = wifiChannel;
             wifi_set_channel(wifiChannel);
 
@@ -67,14 +74,3 @@ void loop(){
     delay(10000);
 }
 
-void randomMac(){
-    for(int i=0; i< 6; i++){
-        macAdd[i] = random(256);
-    }
-}
-
-void initSSID(){
-    for(int i=0; i< 32; i++){
-        emptySSID[i] = ' ';
-    }
-}

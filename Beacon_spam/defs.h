@@ -2,6 +2,7 @@
 #define DEFS_H
 
 #define NUM_BEACONS 10
+#define WPA2 false
 
 namespace defs{
     const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
