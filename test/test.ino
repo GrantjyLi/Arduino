@@ -38,15 +38,12 @@ void setup() {
 
 void sendBeacon(char* ssid){
     int ssidSize = strlen(ssid);
+    int packetSize = 38 + ssidSize + sizeof(postSSID);
+
     packet[37] = ssidSize;
 
     memcpy(&packet[38], ssid, ssidSize);
-
-    int packetSize = 51 + ssidSize;
-
-    for(int i = 0; i < 12; i++) {
-      packet[38 + packetSize + i] = postSSID[i];
-    }
+    memcpy(&packet[38 + ssidSize], postSSID, sizeof(postSSID));
     
     for(int i=0; i < 3 ; i++){
         wifi_set_channel(channels[i]);
@@ -62,12 +59,12 @@ void sendBeacon(char* ssid){
             Serial.println(ssid);
         }
     }
-    delay(1);
+    delay(50);
 }
 
 void loop() {
     char* ssids[] = {"1", "12", "123", "1234", "12345"};
-    sendBeacon(ssids[0]);
-    sendBeacon(ssids[1]);
-    sendBeacon(ssids[2]);
+    for(int i =0; i< 5; i++){
+        sendBeacon(ssids[i]);
+    }
 }
