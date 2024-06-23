@@ -6,7 +6,8 @@ extern "C" {
 }
 
 const uint8_t channels[] = {1, 6, 11};
-
+char* ssids[] = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven"};
+int arrayindex;
 // Beacon Packet buffer
 uint8_t packet[128] = {  
         0x80, 0x00, //Frame Control 
@@ -34,6 +35,7 @@ void setup() {
   wifi_promiscuous_enable(1); 
   Serial.begin(115200);
   Serial.println("");
+  arrayindex =0;
 }
 
 void sendBeacon(char* ssid){
@@ -52,26 +54,32 @@ void sendBeacon(char* ssid){
         packet[50 + ssidSize] = channels[i];
 
         // Randomize SRC MAC
-        for(int k=0; k< 12; k++){
-            packet[10 + k] = random(256);
+        for(int k=0; k< 6; k++){
+            packet[10 + k] = packet[16 + k] = random(256);
         }
         
         //sending packets
-        if(wifi_send_pkt_freedom(packet, packetSize, 0) != 0){
-            Serial.print("Failed to send: ");
-            Serial.println(ssid);
-        }else{
+        // if(wifi_send_pkt_freedom(packet, packetSize, 0) != 0){
+        //     Serial.print("Failed to send: ");
+        //     Serial.println(ssid);
+        // }else{
+        //     Serial.println("Packet sent successfully");
+        //     wifi_send_pkt_freedom(packet, packetSize, 0);
+        //     wifi_send_pkt_freedom(packet, packetSize, 0);
+        // }
+
+        for(int i=0; i<3; i++){
             wifi_send_pkt_freedom(packet, packetSize, 0);
-            wifi_send_pkt_freedom(packet, packetSize, 0);
+            delay(20);
         }
-        delay(50);
+        
     }
     
 }
 
 void loop() {
-    char* ssids[] = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven"};
-    for(int i =0; i< 5; i++){
-        sendBeacon(ssids[i]);
-    }
+    
+    sendBeacon(ssids[arrayindex]);
+    arrayindex++;
+    if(arrayindex >= 11){arrayindex =0;}
 }
