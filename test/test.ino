@@ -42,9 +42,11 @@ void sendBeacon(char* ssid){
 
     packet[37] = ssidSize;
 
+    //copying SSID into packet an post SSID
     memcpy(&packet[38], ssid, ssidSize);
     memcpy(&packet[38 + ssidSize], postSSID, sizeof(postSSID));
     
+    //looping through every wifi channel
     for(int i=0; i < 3 ; i++){
         wifi_set_channel(channels[i]);
         packet[50 + ssidSize] = channels[i];
@@ -54,16 +56,21 @@ void sendBeacon(char* ssid){
             packet[10 + k] = random(256);
         }
         
+        //sending packets
         if(wifi_send_pkt_freedom(packet, packetSize, 0) != 0){
             Serial.print("Failed to send: ");
             Serial.println(ssid);
+        }else{
+            wifi_send_pkt_freedom(packet, packetSize, 0);
+            wifi_send_pkt_freedom(packet, packetSize, 0);
         }
+        delay(50);
     }
-    delay(50);
+    
 }
 
 void loop() {
-    char* ssids[] = {"1", "12", "123", "1234", "12345"};
+    char* ssids[] = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven"};
     for(int i =0; i< 5; i++){
         sendBeacon(ssids[i]);
     }

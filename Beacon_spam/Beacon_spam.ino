@@ -57,6 +57,7 @@ void loop(){
 
         //switch wifi channels
         for(int k=0; k< sizeof(channels); k++){
+            
             wifiChannel = channels[k];
             beaconPacket[82] = wifiChannel;
             wifi_set_channel(wifiChannel);
