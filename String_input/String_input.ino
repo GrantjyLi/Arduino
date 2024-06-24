@@ -6,16 +6,25 @@ void setup() {
 }
 
 void loop() {
-  // Check if data is available to read
-  if (Serial.available() > 0) {
-    // Read the incoming string until a newline character is found
-    String inputString = Serial.readStringUntil('\n');
+
+    String inputString;
+
+    getStrInput(inputString);
     
-    // Print the received string to the serial monitor
-    Serial.print("Received: ");
-    Serial.println(inputString);
-  }
+    test(&inputString[0]);
+  
   
   // Add a short delay to avoid overwhelming the serial buffer
   delay(100);
+}
+
+void getStrInput(String& input){
+    while (!Serial.available()){}
+    input = Serial.readStringUntil('\n');// read the incoming data as string
+    delay(100);
+}
+
+void test(char* test){
+  Serial.print("Received: ");
+  Serial.println(test);
 }

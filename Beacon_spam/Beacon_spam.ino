@@ -10,6 +10,9 @@ extern "C" {
 int arrayindex;
 int packetsSent;
 unsigned int lastTime;
+bool attacking;
+uint8_t menuChoice; // default is default attack
+String customSSID;
 
 void setup() {
     delay(500);
@@ -19,9 +22,13 @@ void setup() {
     arrayindex = 0;
     packetsSent = 0;
     lastTime = millis();
+    attacking = false;
+    menuChoice = 1;
 
     Serial.begin(115200);
-    Serial.println("\n");
+    Serial.println("\nBeacon Spam Menu:\n");
+    Serial.println("1: Default spam with ssids from file.");
+    Serial.println("2: Custom SSID to spam.");
 }
 
 void sendBeacon(const char* ssid){
@@ -54,10 +61,43 @@ void sendBeacon(const char* ssid){
     
 }
 
-void loop() {
+void defaultAttack(){
     sendBeacon(ssids[arrayindex]);
     arrayindex++;
     if(arrayindex >= NUM_SSIDS){arrayindex =0;}
+}
+
+void customAttack(){
+    String newSSID = customSSID + " " + suffixes[arrayindex];
+    sendBeacon(&newSSID[0]);
+    arrayindex++;
+    if(arrayindex >= NUM_SUFFIXES){arrayindex =0;}
+}
+
+void loop() {
+    
+    if(!attacking){
+        attacking = true;
+
+        while (!Serial.available()){}
+        menuChoice = Serial.parseInt();
+
+        if(menuChoice == 2){
+            Serial.print("Enter Custom SSID to spam: ");
+            while (!Serial.available()){}
+            customSSID = Serial.readStringUntil('\n');
+        }
+    }
+
+    switch(menuChoice){
+        case 1:
+            defaultAttack(); break;
+        case 2:
+            customAttack(); break;
+        default:
+            Serial.println("Invalid Input"); 
+            break;
+    }
 
     if (millis() - lastTime > 2000){
         Serial.printf("Packets Sent: %d\n", packetsSent);

@@ -3,11 +3,13 @@
 
 #define NUM_CHANNELS 3
 #define NUM_SSIDS 11
+#define NUM_SUFFIXES 9
 #define WPA2 false
 
 namespace defs{
     const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
     const char* ssids[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "91", "92"};
+    const char* suffixes[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
     //beacon packet header
     uint8_t beaconPacket[128] = {  
