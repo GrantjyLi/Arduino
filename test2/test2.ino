@@ -34,10 +34,6 @@ void loop() {
 }
 
 void sendBeacon(const char* ssid) {
-    // Randomize channel //
-    if(++channelIndex >= 3){channelIndex =0;} 
-    wifi_set_channel(channels[channelIndex]);
-
     uint8_t packet[128] = {
         0x80, 0x00, //Frame Control 
         0x00, 0x00, //Duration
@@ -54,27 +50,26 @@ void sendBeacon(const char* ssid) {
 };
 
     int ssidLen = strlen(ssid);
+    int packetSize = 51 + ssidLen; // Header + post + channel = 37 + 13 + 1
+
     packet[37] = ssidLen;
 
     memcpy(&packet[38], ssid, ssidLen);
     memcpy(&packet[38 + ssidLen], postSSID, 13);
 
-    packet[50 + ssidLen] = channels[channelIndex];
-    
     //random mac address
     for(int k=0; k< 6; k++){
         packet[10 + k] = packet[16 + k] = random(256);
     }
 
-    int packetSize = 51 + ssidLen;
-    /*
-      header: 37
-      post packet: 13
-      channel: 1 
-    */
+    for(int i=0; i< 3; i++){
+      wifi_set_channel(channels[i]);
 
-    for (int k = 0; k < 3; k++) {
-        Serial.println(wifi_send_pkt_freedom(packet, packetSize, 0));
-        delay(1);
+      packet[50 + ssidLen] = channels[i];
+
+      for (int k = 0; k < 3; k++) {
+          Serial.println(wifi_send_pkt_freedom(packet, packetSize, 0));
+          delay(1);
+      }
     }
 }

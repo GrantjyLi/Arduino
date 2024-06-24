@@ -7,9 +7,7 @@
 namespace defs{
     const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
     char* ssids[] = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven"};
-    
-    // Beacon Packet buffer
-    uint8_t packet[128] = {  
+        uint8_t packet[128] = {  
             0x80, 0x00, //Frame Control 
             0x00, 0x00, //Duration
     /*4*/   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, //Destination address 
@@ -23,7 +21,7 @@ namespace defs{
     /* SSID */
     /*36*/  0x00
     };                       
-
+        // Beacon Packet buffer
     uint8_t postSSID[13] = {
             0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, //supported rate
             0x03, 0x01, 0x04

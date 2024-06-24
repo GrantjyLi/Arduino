@@ -7,7 +7,7 @@ using namespace defs;
 extern "C" {
   #include "user_interface.h"
 }
-int arrayindex;
+int arrayindex =0;
 
 void setup() {
   delay(500);
@@ -18,7 +18,7 @@ void setup() {
   arrayindex =0;
 }
 
-void sendBeacon(char* ssid){
+void sendBeacon(const char* ssid){
     int ssidSize = strlen(ssid);
     int packetSize = 38 + ssidSize + sizeof(postSSID);
 
@@ -27,30 +27,22 @@ void sendBeacon(char* ssid){
     //copying SSID into packet an post SSID
     memcpy(&packet[38], ssid, ssidSize);
     memcpy(&packet[38 + ssidSize], postSSID, sizeof(postSSID));
+
+    for(int k=0; k< 6; k++){
+        packet[10 + k] = packet[16 + k] = random(256);
+    }
     
     //looping through every wifi channel
     for(int i=0; i < 3 ; i++){
+        // Randomize SRC MAC
+    
+
         wifi_set_channel(channels[i]);
         packet[50 + ssidSize] = channels[i];
 
-        // Randomize SRC MAC
-        for(int k=0; k< 6; k++){
-            packet[10 + k] = packet[16 + k] = random(256);
-        }
-        
-        //sending packets
-        // if(wifi_send_pkt_freedom(packet, packetSize, 0) != 0){
-        //     Serial.print("Failed to send: ");
-        //     Serial.println(ssid);
-        // }else{
-        //     Serial.println("Packet sent successfully");
-        //     wifi_send_pkt_freedom(packet, packetSize, 0);
-        //     wifi_send_pkt_freedom(packet, packetSize, 0);
-        // }
-
         for(int i=0; i<3; i++){
             wifi_send_pkt_freedom(packet, packetSize, 0);
-            delay(20);
+            delay(1);
         }
         
     }
