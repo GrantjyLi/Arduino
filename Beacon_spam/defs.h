@@ -19,7 +19,7 @@ namespace defs{
     //Frame body starts here
     /*24*/  0x83, 0x51, 0xf7, 0x8f, 0x0f, 0x00, 0x00, 0x00, //timestamp - the number of microseconds the AP has been active
     /*32*/  0xFF, 0x00, //Beacon interval
-    /*34*/  0x01, 0x04, //Capability info
+    /*34*/  0x21, 0x04, //Capability info
     /* SSID */
     /*36*/  0x00
     };                       
