@@ -7,41 +7,46 @@ using namespace defs;
 extern "C" {
   #include "user_interface.h"
 }
-int arrayindex =0;
+int arrayindex;
+int packetsSent;
+unsigned int lastTime;
 
 void setup() {
-  delay(500);
-  wifi_set_opmode(STATION_MODE);
-  wifi_promiscuous_enable(1); 
-  Serial.begin(115200);
-  Serial.println("");
-  arrayindex =0;
+    delay(500);
+    wifi_set_opmode(STATION_MODE);
+    wifi_promiscuous_enable(1); 
+
+    arrayindex = 0;
+    packetsSent = 0;
+    lastTime = millis();
+
+    Serial.begin(115200);
+    Serial.println("\n");
 }
 
 void sendBeacon(const char* ssid){
     int ssidSize = strlen(ssid);
     int packetSize = 38 + ssidSize + sizeof(postSSID);
 
-    packet[37] = ssidSize;
+    beaconPacket[37] = ssidSize;
 
     //copying SSID into packet an post SSID
-    memcpy(&packet[38], ssid, ssidSize);
-    memcpy(&packet[38 + ssidSize], postSSID, sizeof(postSSID));
+    memcpy(&beaconPacket[38], ssid, ssidSize);
+    memcpy(&beaconPacket[38 + ssidSize], postSSID, sizeof(postSSID));
 
+    // Randomize SRC MAC
     for(int k=0; k< 6; k++){
-        packet[10 + k] = packet[16 + k] = random(256);
+        beaconPacket[10 + k] = beaconPacket[16 + k] = random(256);
     }
-    
+
     //looping through every wifi channel
-    for(int i=0; i < 3 ; i++){
-        // Randomize SRC MAC
-    
-
+    for(int i=0; i < NUM_CHANNELS ; i++){
         wifi_set_channel(channels[i]);
-        packet[50 + ssidSize] = channels[i];
+        beaconPacket[50 + ssidSize] = channels[i];
 
+        //send it out 3 times to be sure
         for(int i=0; i<3; i++){
-            wifi_send_pkt_freedom(packet, packetSize, 0);
+            packetsSent += wifi_send_pkt_freedom(beaconPacket, packetSize, 0) == 0;  
             delay(1);
         }
         
@@ -50,8 +55,12 @@ void sendBeacon(const char* ssid){
 }
 
 void loop() {
-    
     sendBeacon(ssids[arrayindex]);
     arrayindex++;
-    if(arrayindex >= 11){arrayindex =0;}
+    if(arrayindex >= NUM_SSIDS){arrayindex =0;}
+
+    if (millis() - lastTime > 2000){
+        Serial.printf("Packets Sent: %d\n", packetsSent);
+        lastTime = millis();
+    }
 }
