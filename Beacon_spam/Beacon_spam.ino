@@ -1,77 +1,65 @@
+
 #include <ESP8266WiFi.h>
 #include "defs.h"
 
 using namespace defs;
 
 extern "C" {
-    #include "user_interface.h"
-    typedef void (*freedom_outside_cb_t)(uint8 status);
-    int wifi_register_send_pkt_freedom_cb(freedom_outside_cb_t cb);
-    void wifi_unregister_send_pkt_freedom_cb(void);
-    int wifi_send_pkt_freedom(uint8 *buf, int len, bool sys_seq);
+  #include "user_interface.h"
+}
+int arrayindex;
+
+void setup() {
+  delay(500);
+  wifi_set_opmode(STATION_MODE);
+  wifi_promiscuous_enable(1); 
+  Serial.begin(115200);
+  Serial.println("");
+  arrayindex =0;
 }
 
-char emptySSID[32];
-uint8_t macAdd[6];
-uint8_t wifiChannel;
-uint32_t packetSize;
+void sendBeacon(char* ssid){
+    int ssidSize = strlen(ssid);
+    int packetSize = 38 + ssidSize + sizeof(postSSID);
 
-char ssid[] = "cheese\n";
+    packet[37] = ssidSize;
 
-void setup(){
-    packetSize = sizeof(beaconPacket);
+    //copying SSID into packet an post SSID
+    memcpy(&packet[38], ssid, ssidSize);
+    memcpy(&packet[38 + ssidSize], postSSID, sizeof(postSSID));
     
-    for(int i=0; i< 32; i++){
-        emptySSID[i] = ' ';
-    }
+    //looping through every wifi channel
+    for(int i=0; i < 3 ; i++){
+        wifi_set_channel(channels[i]);
+        packet[50 + ssidSize] = channels[i];
 
-    Serial.begin(115200);
-    Serial.println();
-    
-    WiFi.mode(WIFI_OFF); // No AP or STA mode
-    wifi_set_opmode(STATION_MODE);
-
-    if (WPA2) {
-        beaconPacket[34] = 0x31;
-    } else {
-        beaconPacket[34] = 0x21;
-        packetSize -= 26;
-    }
-}
-
-void loop(){
-
-    for(int i=0; i<NUM_BEACONS; i++){
-        
+        // Randomize SRC MAC
         for(int k=0; k< 6; k++){
-            macAdd[k] = random(256);
+            packet[10 + k] = packet[16 + k] = random(256);
         }
+        
+        //sending packets
+        // if(wifi_send_pkt_freedom(packet, packetSize, 0) != 0){
+        //     Serial.print("Failed to send: ");
+        //     Serial.println(ssid);
+        // }else{
+        //     Serial.println("Packet sent successfully");
+        //     wifi_send_pkt_freedom(packet, packetSize, 0);
+        //     wifi_send_pkt_freedom(packet, packetSize, 0);
+        // }
 
-        //copy fake mac address into the packet
-        memcpy(&beaconPacket[10], macAdd, 6);
-        memcpy(&beaconPacket[16], macAdd, 6);
-
-        //reset and write ssid into the packet
-        memcpy(&beaconPacket[38], emptySSID, 32);
-        memcpy_P(&beaconPacket[38], ssid, sizeof(ssid));
-
-        //switch wifi channels
-        for(int k=0; k< sizeof(channels); k++){
-            
-            wifiChannel = channels[k];
-            beaconPacket[82] = wifiChannel;
-            wifi_set_channel(wifiChannel);
-
-            if(wifi_send_pkt_freedom(beaconPacket, packetSize, 0) != 0 ){
-                Serial.println("Packet Failed to send.");
-            }else{
-                Serial.println("Packet Sent Successfully.");
-            }
-            
-            delay(1);
+        for(int i=0; i<3; i++){
+            wifi_send_pkt_freedom(packet, packetSize, 0);
+            delay(20);
         }
+        
     }
-
-    delay(10000);
+    
 }
 
+void loop() {
+    
+    sendBeacon(ssids[arrayindex]);
+    arrayindex++;
+    if(arrayindex >= 11){arrayindex =0;}
+}
