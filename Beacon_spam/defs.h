@@ -1,6 +1,12 @@
 #ifndef DEFS_H
 #define DEFS_H
 
+#include <ESP8266WiFi.h>
+
+extern "C" {
+    #include "user_interface.h"
+}
+
 #define NUM_CHANNELS 3
 #define NUM_SSIDS 10
 #define WPA2 false
@@ -8,6 +14,15 @@
 namespace defs{
     const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
     const char* ssids[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+
+    int arrayindex;
+    int packetsSent;
+    unsigned int lastTime;
+    bool attacking;
+    uint8_t menuChoice; // default is default attack
+    String customSSID; // custom SSID for the user to enter
+    uint8_t numSSID; // current number of fake SSIDS showing 
+    uint8_t numSSIDLimit; // how many fake SSIDS to show to create based on custom input
 
     //beacon packet header
     uint8_t beaconPacket[128] = {  

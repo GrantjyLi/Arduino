@@ -1,20 +1,7 @@
 
-#include <ESP8266WiFi.h>
 #include "defs.h"
 
 using namespace defs;
-
-extern "C" {
-  #include "user_interface.h"
-}
-int arrayindex;
-int packetsSent;
-unsigned int lastTime;
-bool attacking;
-uint8_t menuChoice; // default is default attack
-String customSSID; // custom SSID for the user to enter
-uint8_t numSSID; // current number of fake SSIDS showing 
-uint8_t numSSIDLimit; // how many fake SSIDS to show to create based on custom input
 
 void setup() {
     delay(500);
