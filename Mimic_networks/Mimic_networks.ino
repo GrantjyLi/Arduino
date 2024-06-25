@@ -24,6 +24,7 @@ DNSServer dnsServer;
 
 String SSID;
 bool apStarted = false; // to see if there is a point running
+bool internetConnection = false;
 
 void setup() {
 
@@ -35,16 +36,28 @@ void setup() {
     Serial.begin(115200);
     Serial.flush();
 
-    //connecting to internet
-    WiFi.begin(HOST_SSID, HOST_PASSWORD);
-    while (WiFi.status() != WL_CONNECTED){
-        Serial.println(".");
-        delay(1000);
-    }
-    Serial.println("Connected To Internet");
 
-    firebaseSetup();
+    Serial.println("\n");//need online mode for firebase
+    Serial.println("1: Online Mode");
+    Serial.println("2: Offline Mode");
+    Serial.print("Enter Mode: ");
     
+    while (!Serial.available()){}
+    internetConnection = Serial.parseInt() == 1;
+
+    if(internetConnection){
+        //connecting to internet
+        Serial.println("Connecting to Internet...");
+
+        WiFi.begin(HOST_SSID, HOST_PASSWORD);
+        while (WiFi.status() != WL_CONNECTED){
+            Serial.println(".");
+            delay(1000);
+        }
+        Serial.println("Connected To Internet");
+
+        firebaseSetup();
+    }
 }
 
 
@@ -52,22 +65,22 @@ void loop(){
     if (!apStarted){
 
         printInstruction();
-        while (!Serial.available()) {
-            // Wait for user input
-        }
-        char input = Serial.read();
+        uint8_t menuInput=0;
+        getIntInput(menuInput);
 
-        switch (input){
-            case '1':
+        switch (menuInput){
+            case 1:
                 findNewNetworks();
                 break;
-            case '2':
+            case 2:
                 MimicNetwork();
                 break;
-            case '3':
+            case 3:
                 Serial.print("Enter custom SSID: ");
                 getStrInput(SSID);
                 createAP();
+                break;
+            case 4:
                 break;
             default:
                 Serial.println("Enter a Valid Answer: ");

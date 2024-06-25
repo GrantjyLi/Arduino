@@ -2,9 +2,11 @@
 
 namespace View {
     void printInstruction(){
-        Serial.println("\nEnter 1 to refresh for networks.");
-        Serial.println("Enter 2 to mimic a found network SSID.");
-        Serial.println("Enter 3 to create a unique network SSID.\n");
+        Serial.print("\n");
+        Serial.println("1: Observe networks.");
+        Serial.println("2: Evil Twin on observed network");
+        Serial.println("3: custom fake network");
+        Serial.println("4: Beacon spam");
 
         Serial.print("Enter choice: ");
     }
@@ -25,6 +27,6 @@ namespace View {
     void getIntInput(uint8_t& input){
         while (!Serial.available()){}
         input = Serial.parseInt();
-        delay(100);
+        delay(20);
     }
 }

@@ -19,6 +19,7 @@
 
 extern ESP8266WebServer server;
 extern String SSID;
+extern bool internetConnection;
 
 using namespace FirebaseCom;
 
@@ -26,7 +27,6 @@ namespace WebPortal{
     String getHTML(String&);
     void handleConnect();
     void handleSubmit();
-
     
 }
 
