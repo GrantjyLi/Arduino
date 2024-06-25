@@ -2,6 +2,7 @@
 #define DEFS_H
 
 #include <ESP8266WiFi.h>
+#include <Arduino.h>
 
 extern "C" {
     #include "user_interface.h"
@@ -23,7 +24,8 @@ namespace defs{
     String customSSID; // custom SSID for the user to enter
     uint8_t numSSID; // current number of fake SSIDS showing 
     uint8_t numSSIDLimit; // how many fake SSIDS to show to create based on custom input
-
+    uint32_t attackTime;
+    
     //beacon packet header
     uint8_t beaconPacket[128] = {  
         0x80, 0x00, //Frame Control 

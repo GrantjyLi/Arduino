@@ -81,6 +81,10 @@ namespace BeaconSpam{
                 Serial.print("# of networks spammed: ");
                 while (!Serial.available()){}
                 numSSIDLimit = Serial.parseInt();
+
+                Serial.print("Spam Duration (seconds): ");
+                while (!Serial.available()){}
+                numSSIDLimit = Serial.parseInt();
             }
         }
 
