@@ -10,7 +10,7 @@ void loop() {
     String inputString;
 
     getStrInput(inputString);
-    
+    inputString += 3;
     test(&inputString[0]);
   
   

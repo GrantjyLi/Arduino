@@ -12,7 +12,9 @@ int packetsSent;
 unsigned int lastTime;
 bool attacking;
 uint8_t menuChoice; // default is default attack
-String customSSID;
+String customSSID; // custom SSID for the user to enter
+uint8_t numSSID; // current number of fake SSIDS showing 
+uint8_t numSSIDLimit; // how many fake SSIDS to show to create based on custom input
 
 void setup() {
     delay(500);
@@ -24,6 +26,8 @@ void setup() {
     lastTime = millis();
     attacking = false;
     menuChoice = 1;
+    numSSIDLimit = 0;
+    numSSID = 0;
 
     Serial.begin(115200);
     Serial.println("\nBeacon Spam Menu:\n");
@@ -68,10 +72,11 @@ void defaultAttack(){
 }
 
 void customAttack(){
-    String newSSID = customSSID + " " + suffixes[arrayindex];
+    String newSSID = customSSID + " ";
+    newSSID += numSSID;
     sendBeacon(&newSSID[0]);
-    arrayindex++;
-    if(arrayindex >= NUM_SUFFIXES){arrayindex =0;}
+    
+    if(++numSSID >= numSSIDLimit){numSSID =0;}
 }
 
 void loop() {
@@ -86,6 +91,10 @@ void loop() {
             Serial.print("Enter Custom SSID to spam: ");
             while (!Serial.available()){}
             customSSID = Serial.readStringUntil('\n');
+
+            Serial.print("# of networks spammed: ");
+            while (!Serial.available()){}
+            numSSIDLimit = Serial.parseInt();
         }
     }
 
