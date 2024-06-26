@@ -2,6 +2,7 @@
 #include "View.h"
 #include "WebPortal.h"
 #include "FirebaseCom.h"
+#include "BeaconSpam.h"
 
 using namespace View;
 using namespace WebPortal;
@@ -25,6 +26,8 @@ DNSServer dnsServer;
 String SSID;
 bool apStarted = false; // to see if there is a point running
 bool internetConnection = false;
+bool attacking = false; //if any attacks are happening
+bool beaconSpamAttack = false;
 
 void setup() {
 
@@ -62,7 +65,7 @@ void setup() {
 
 
 void loop(){
-    if (!apStarted){
+    if (!attacking){
 
         printInstruction();
         uint8_t menuInput=0;
@@ -74,13 +77,17 @@ void loop(){
                 break;
             case 2:
                 MimicNetwork();
+                attacking = true;
                 break;
             case 3:
                 Serial.print("Enter custom SSID: ");
                 getStrInput(SSID);
                 createAP();
+                attacking = true;
                 break;
             case 4:
+                beaconSpamSetup();
+                beaconSpamAttack = true;
                 break;
             default:
                 Serial.println("Enter a Valid Answer: ");
@@ -89,8 +96,12 @@ void loop(){
         }
     }
     else{
-        dnsServer.processNextRequest();
-        server.handleClient();
+        if(beaconSpamAttack) beaconSpam();
+
+        if(apStarted){
+            dnsServer.processNextRequest();
+            server.handleClient();
+        }
     }
             
     delay(500);
