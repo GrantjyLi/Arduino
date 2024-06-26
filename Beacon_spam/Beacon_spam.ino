@@ -15,11 +15,10 @@ void setup() {
     menuChoice = 1;
     numSSIDLimit = 0;
     numSSID = 0;
+    attackTime = 0;
 
     Serial.begin(115200);
-    Serial.println("\nBeacon Spam Menu:\n");
-    Serial.println("1: Default spam with ssids from file.");
-    Serial.println("2: Custom SSID to spam.");
+    Serial.println("");
 }
 
 void sendBeacon(const char* ssid){
@@ -66,23 +65,35 @@ void customAttack(){
     if(++numSSID >= numSSIDLimit){numSSID =0;}
 }
 
+void initAttack(){
+    Serial.print("\nAttack Duration (seconds): ");
+    while (!Serial.available()){}
+    attackTime = Serial.readStringUntil('\n').toInt();
+
+    Serial.println("Beacon Spam Menu:\n");
+    Serial.println("1: Default spam with ssids from file.");
+    Serial.println("2: Custom SSID to spam.");
+
+    while (!Serial.available()){}
+    menuChoice = Serial.parseInt();
+
+    if(menuChoice == 2){
+        Serial.print("Enter Custom SSID to spam: ");
+        while (!Serial.available()){}
+        customSSID = Serial.readStringUntil('\n');
+
+        Serial.print("# of networks spammed: ");
+        while (!Serial.available()){}
+        numSSIDLimit = Serial.parseInt();
+    }
+    startTime = millis();
+}
+
 void loop() {
     
     if(!attacking){
+        initAttack();
         attacking = true;
-
-        while (!Serial.available()){}
-        menuChoice = Serial.parseInt();
-
-        if(menuChoice == 2){
-            Serial.print("Enter Custom SSID to spam: ");
-            while (!Serial.available()){}
-            customSSID = Serial.readStringUntil('\n');
-
-            Serial.print("# of networks spammed: ");
-            while (!Serial.available()){}
-            numSSIDLimit = Serial.parseInt();
-        }
     }
 
     switch(menuChoice){
@@ -91,12 +102,18 @@ void loop() {
         case 2:
             customAttack(); break;
         default:
-            Serial.println("Invalid Input"); 
+            Serial.println("Invalid Input");
+            attacking = false;
             break;
     }
 
     if (millis() - lastTime > 2000){
         Serial.printf("Packets Sent: %d\n", packetsSent);
         lastTime = millis();
+    }
+
+    if(millis() >= startTime + attackTime*1000){
+        attacking = false;
+        Serial.println("Attack ended.\n");
     }
 }

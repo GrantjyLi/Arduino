@@ -18,13 +18,14 @@ namespace defs{
 
     int arrayindex;
     int packetsSent;
-    unsigned int lastTime;
     bool attacking;
     uint8_t menuChoice; // default is default attack
     String customSSID; // custom SSID for the user to enter
     uint8_t numSSID; // current number of fake SSIDS showing 
     uint8_t numSSIDLimit; // how many fake SSIDS to show to create based on custom input
-    uint32_t attackTime;
+    uint32_t lastTime; // keeps track of the last time and updates the serial monitor every 2 seconds
+    uint16_t attackTime; // how long the attack lasts
+    uint32_t startTime; //starting time of the attack
     
     //beacon packet header
     uint8_t beaconPacket[128] = {  
