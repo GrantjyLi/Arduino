@@ -61,6 +61,7 @@ void setup() {
 
         firebaseSetup();
     }
+    delay(10);
 }
 
 
