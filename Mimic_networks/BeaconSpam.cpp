@@ -42,7 +42,6 @@ uint8_t menuChoice; // default is default attack
 String customSSID; // custom SSID for the user to enter
 uint8_t numSSID; // current number of fake SSIDS showing 
 uint8_t numSSIDLimit; // how many fake SSIDS to show to create based on custom input
-uint16_t attackTime;
 
 void beaconSpamSetup() {
     wifi_set_opmode(STATION_MODE);
