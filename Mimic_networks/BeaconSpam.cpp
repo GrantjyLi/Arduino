@@ -9,21 +9,7 @@ extern "C" {
 #define NUM_SSIDS 10
 #define WPA2 false
 
-
-const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
-const char* ssids[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-
-int arrayindex;
-int packetsSent;
-unsigned int lastTime;
-bool spamming;
-uint8_t menuChoice; // default is default attack
-String customSSID; // custom SSID for the user to enter
-uint8_t numSSID; // current number of fake SSIDS showing 
-uint8_t numSSIDLimit; // how many fake SSIDS to show to create based on custom input
-uint16_t attackTime;
-
-//beacon packet header
+    //beacon packet header
 uint8_t beaconPacket[128] = {  
     0x80, 0x00, //Frame Control 
     0x00, 0x00, //Duration
@@ -44,6 +30,20 @@ uint8_t postSSID[13] = {
         0x03, 0x01, 0x04
 };
 
+
+const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
+const char* ssids[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+
+int arrayindex;
+int packetsSent;
+unsigned int lastTime;
+bool spamming;
+uint8_t menuChoice; // default is default attack
+String customSSID; // custom SSID for the user to enter
+uint8_t numSSID; // current number of fake SSIDS showing 
+uint8_t numSSIDLimit; // how many fake SSIDS to show to create based on custom input
+uint16_t attackTime;
+
 void beaconSpamSetup() {
     wifi_set_opmode(STATION_MODE);
     wifi_promiscuous_enable(1); 
@@ -58,6 +58,7 @@ void beaconSpamSetup() {
 }
 
 void sendBeacon(const char* ssid){
+
     int ssidSize = strlen(ssid);
     int packetSize = 38 + ssidSize + sizeof(postSSID);
 
@@ -115,10 +116,6 @@ void initAttack(){
         customSSID = Serial.readStringUntil('\n');
 
         Serial.print("# of networks spammed: ");
-        while (!Serial.available()){}
-        numSSIDLimit = Serial.parseInt();
-
-        Serial.print("Spam Duration (seconds): ");
         while (!Serial.available()){}
         numSSIDLimit = Serial.parseInt();
     }

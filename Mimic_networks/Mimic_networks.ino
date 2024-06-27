@@ -88,14 +88,14 @@ void loop(){
             case 4:
                 beaconSpamSetup();
                 beaconSpamAttack = true;
+                attacking = true;
                 break;
             default:
                 Serial.println("Enter a Valid Answer: ");
                 printInstruction();
                 break;
         }
-    }
-    else{
+    } else{
         if(beaconSpamAttack) beaconSpam();
 
         if(apStarted){
@@ -104,7 +104,6 @@ void loop(){
         }
     }
             
-    delay(500);
 }
 
 void findNewNetworks(){
