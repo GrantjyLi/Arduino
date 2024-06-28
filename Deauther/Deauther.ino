@@ -5,7 +5,7 @@
 uint8_t numNetworks = 0;
 uint32_t *knownMACS[NUMNET];
 bool found;
-uint8_t* targetMAC;
+uint8_t targetMAC[6];
 uint8_t packetSize;
 
 uint8_t deauthPacket[26] = {
@@ -63,20 +63,25 @@ void findNewNetworks(){
     bool newNetwork = true;
 
     for (uint8_t k = 0; k < numNetworks; k++){
-      if(*newMAC == *(knownMACS[k])){
+      if(memcmp(newMAC, &(knownMACS[k]), 6) == 0){
         newNetwork = false;
         break;
       }
     }
 
     if(newNetwork){
+      if (numNetworks < NUMNET) {
+          memcpy(knownMACS[numNetworks], newMAC, 6);
+          numNetworks++;
+        }
+
       if(WiFi.SSID(i) == "GPhone"){
         Serial.println("Network found");
         Serial.printf("Mac Address: %s\n", WiFi.BSSIDstr(i));
         Serial.printf("Wifi Channel: %d\n", WiFi.channel(i));
 
         found = true;
-        targetMAC = WiFi.BSSID(i);
+        memcpy(targetMAC, newMAC, 6);
         wifi_set_channel(WiFi.channel(i));//same channel as target AP
         
         break;
