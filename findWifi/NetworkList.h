@@ -5,19 +5,22 @@
 
 class NetworkList{
     public:
+        NetworkList();
+        ~NetworkList();
         String* getSSID(uint8_t);
         String* getBSSIDstr(uint8_t);
+        uint8_t* getBSSID(uint8_t);
         float getRSN(uint8_t);
         uint8_t getLength();
-        void addNetwork(String&, String&, float);
-        ~NetworkList();
+        bool addNetwork(String&, String&, uint8_t*,  float);
 
     private:
         uint8_t size;
         String SSIDList[MAXSSIDS];
         String BSSIDstrList[MAXSSIDS];
         uint8_t* BSSIDList[MAXSSIDS];
-        String RSNList[MAXSSIDS];
+        float RSNList[MAXSSIDS];
+        void printNetworks();
 
 
 };

@@ -1,5 +1,13 @@
 {
     "files.associations": {
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "array": "cpp",
+        "buffer": "cpp",
+        "internet": "cpp",
+        "socket": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "ranges": "cpp",
+        "utility": "cpp"
     }
 }
