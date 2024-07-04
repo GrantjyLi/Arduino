@@ -10,13 +10,6 @@ namespace View {
 
         Serial.print("Enter choice: ");
     }
-
-    void printNetwork(String SSID, uint8_t strength, uint8_t numNetwork){
-        Serial.println("--------------------------");
-        Serial.printf("Network #: %d\n", numNetwork);
-        Serial.printf("SSID: %s\n", SSID);
-        Serial.printf("Strength: %d\n", strength);
-    }
     
     void getStrInput(String& input){
         while (!Serial.available()){}

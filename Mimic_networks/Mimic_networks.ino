@@ -1,17 +1,13 @@
 #include <ESP8266WiFi.h>
 #include "View.h"
 #include "WebPortal.h"
+#include "NetworkList.h"
 #include "FirebaseCom.h"
 #include "BeaconSpam.h"
 
 using namespace View;
 using namespace WebPortal;
 using namespace FirebaseCom;
-
-#define MAXSSIDS 50
-
-uint8_t numNetworks = 0;
-String knownSSIDs[MAXSSIDS];
 
 IPAddress local_IP(192,168,4,22);
 IPAddress subnet(255,255,255,0);
@@ -22,6 +18,8 @@ FirebaseConfig config;
 
 ESP8266WebServer server(DEFAULT_PORT);
 DNSServer dnsServer;
+
+NetworkList networks;
 
 String SSID;
 bool apStarted = false; // to see if there is a point running
@@ -111,36 +109,34 @@ void findNewNetworks(){
     Serial.println("\nScanning for available networks:");
 
     uint8_t newNumNetworks = WiFi.scanNetworks();
+    String SSID;
+    String BSSIDstr;
+    uint8_t BSSID[6];
+    float RSSI;
+    uint8_t channel;
 
     for (uint8_t i = 0; i < newNumNetworks; i++){
-        String newSSID = WiFi.SSID(i);
-        bool newNetwork = true;
+        SSID = WiFi.SSID(i);
+        BSSIDstr = WiFi.BSSIDstr(i);
+        memcpy(BSSID, WiFi.BSSID(i), 6);
+        RSSI = WiFi.RSSI(i);
+        channel = WiFi.channel(i);
 
-        for (uint8_t k = 0; k < numNetworks; k++){
-            if(newSSID == knownSSIDs[k]){
-            newNetwork = false;
-            break;
-            }
-        }
-
-        if(newNetwork){
-            printNetwork(WiFi.SSID(i), WiFi.RSSI(i), numNetworks);
-            knownSSIDs[numNetworks] = newSSID;
-            numNetworks++;
-        }
+        networks.addNetwork(SSID, BSSIDstr, BSSID, RSSI, channel);
+   
     }
+    networks.printNetworks();
 }
 
 void MimicNetwork(){
-    printAllNetwork();
     
     Serial.print("\nWhich network # to mimic: ");
     uint8_t networkNum;
     getIntInput(networkNum);
     Serial.printf("\nChosing network #%d\n", networkNum);
 
-    if(networkNum >= 0 && networkNum < numNetworks){
-        SSID = knownSSIDs[networkNum];
+    if(networkNum >= 0 && networkNum <= networks.getSize()){
+        SSID = *networks.getSSID(networkNum-1);
         createAP();
     }else{
         Serial.println("Invalid network number.");
@@ -187,9 +183,4 @@ void createAP(){
     apStarted = true;
 }
 
-void printAllNetwork(){
-    for (uint8_t i = 0; i < numNetworks; i++){
-        printNetwork(WiFi.SSID(i), WiFi.RSSI(i), i);
-    }
-    
-}
+
