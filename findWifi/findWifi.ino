@@ -11,7 +11,7 @@ void setup() {
   
   delay(20); // Wait for the module to disconnect
 
-  Serial.println("Scanning for available networks:");
+  Serial.println("\nScanning for available networks:");
 
 }
 
@@ -31,11 +31,17 @@ void findNewNetworks(){
   uint8_t channel;
 
   for (uint8_t i = 0; i < newNumNetworks; i++){
-    SSID = WiFi.SSID(i).c_str();
-    BSSIDstr = WiFi.BSSIDstr(i).c_str();
+    SSID = WiFi.SSID(i);
+    BSSIDstr = WiFi.BSSIDstr(i);
     memcpy(BSSID, WiFi.BSSID(i), 6);
     RSSI = WiFi.RSSI(i);
     channel = WiFi.channel(i);
+
+    // if(networks.addNetwork(SSID, BSSIDstr, BSSID, RSSI, channel)){
+    //   Serial.println("-------------------------------------------");
+    //   Serial.printf("SSID: %s\n", SSID.c_str());
+    //   Serial.printf("BSSID: %s\n", BSSIDstr.c_str());
+    // }
 
     networks.addNetwork(SSID, BSSIDstr, BSSID, RSSI, channel);
    

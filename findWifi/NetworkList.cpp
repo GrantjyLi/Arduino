@@ -23,7 +23,7 @@ uint8_t NetworkList::getChannel(uint8_t index){
     return channelList[size];
 }
 
-uint8_t NetworkList::getLength(){
+uint8_t NetworkList::getSize(){
     return size;
 }
 
@@ -52,22 +52,21 @@ bool NetworkList::isNew(uint8_t* BSSID){
 
 void NetworkList::printNetworks(){
     Serial.println("Found Networks: ");
-    Serial.printf("     %-21s%-9s%-3s%s\n", "SSID", "MAC Address", "Channel", "RSSI");
-    Serial.println("---------------------------------------------------------------");
+    Serial.printf("     %-34s%-20s%-10s%s\n", "SSID", "MAC Address", "Channel", "RSSI");
+    Serial.println("-------------------------------------------------------------------------");
 
     String offset;
     for(uint8_t i =0 ; i<size; i++){
         offset = i+1 >= 10 ? "  " : "   ";
         Serial.printf("#%d%s", i+1, offset);
 
-        offset = "";
-        for(uint8_t k; k < 25 - (*getSSID(i)).length(); k++){
-            offset += " ";
+        Serial.printf("%s", getSSID(i)->c_str());
+
+        for(uint8_t k =0 ; k < 34 - getSSID(i)->length(); k++){
+            Serial.print(" ");
         }
 
-        Serial.printf("%s%s", *getSSID(i), offset);
-
-        Serial.printf("%s%s", *getBSSIDstr(i), "   ");
+        Serial.printf("%s%s", getBSSIDstr(i)->c_str(), "   ");
 
         offset = getChannel(i) >= 10 ? "    " : "     ";
         Serial.printf("   %d%s", getChannel(i), offset);

@@ -14,7 +14,7 @@ class NetworkList{
         uint8_t* getBSSID(uint8_t);
         float getRSSI(uint8_t);
         uint8_t getChannel(uint8_t);
-        uint8_t getLength();
+        uint8_t getSize();
         bool addNetwork(String&, String&, uint8_t*,  float, uint8_t);
         bool isNew(uint8_t*);
         void printNetworks();
