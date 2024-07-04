@@ -20,7 +20,7 @@ float NetworkList::getRSSI(uint8_t index){
 }
 
 uint8_t NetworkList::getChannel(uint8_t index){
-    return channelList[size];
+    return channelList[index];
 }
 
 uint8_t NetworkList::getSize(){
@@ -48,7 +48,6 @@ bool NetworkList::isNew(uint8_t* BSSID){
     }
     return true;
 }
-
 
 void NetworkList::printNetworks(){
     Serial.println("Found Networks: ");

@@ -39,8 +39,8 @@ void findNewNetworks(){
 
     // if(networks.addNetwork(SSID, BSSIDstr, BSSID, RSSI, channel)){
     //   Serial.println("-------------------------------------------");
-    //   Serial.printf("SSID: %s\n", SSID.c_str());
-    //   Serial.printf("BSSID: %s\n", BSSIDstr.c_str());
+    //   Serial.printf("channel: %d\n", networks.getChannel(networks.getSize()-1));
+    //   Serial.printf("channel: %d\n", channel);
     // }
 
     networks.addNetwork(SSID, BSSIDstr, BSSID, RSSI, channel);
