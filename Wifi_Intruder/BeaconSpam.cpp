@@ -1,13 +1,8 @@
 
 #include "BeaconSpam.h"
+const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
+const char* spam_SSIDS[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
-extern "C" {
-    #include "user_interface.h"
-}
-
-#define NUM_CHANNELS 3
-#define NUM_SSIDS 10
-#define WPA2 false
 
     //beacon packet header
 uint8_t beaconPacket[128] = {  
@@ -31,9 +26,6 @@ uint8_t postSSID[13] = {
 };
 
 
-const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
-const char* ssids[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-
 int arrayindex;
 int packetsSent;
 unsigned int lastTime;
@@ -43,8 +35,17 @@ String customSSID; // custom SSID for the user to enter
 uint8_t numSSID; // current number of fake SSIDS showing 
 uint8_t numSSIDLimit; // how many fake SSIDS to show to create based on custom input
 
-void beaconSpamSetup() {
-    wifi_set_opmode(STATION_MODE);
+bool beaconSpamSetup() {
+    if(NUM_SSIDS == 0){
+        Serial.println("No existing spam names");
+        return false;
+    }
+
+    if(!wifi_set_opmode(STATION_MODE)){
+        Serial.println("Cannot set station mode");
+        return false;
+    }
+
     wifi_promiscuous_enable(1); 
 
     arrayindex = 0;
@@ -54,6 +55,8 @@ void beaconSpamSetup() {
     menuChoice = 1;
     numSSIDLimit = 0;
     numSSID = 0;
+
+    return true;
 }
 
 void sendBeacon(const char* ssid){
@@ -88,7 +91,7 @@ void sendBeacon(const char* ssid){
 }
 
 void defaultAttack(){
-    sendBeacon(ssids[arrayindex]);
+    sendBeacon(spam_SSIDS[arrayindex]);
     arrayindex++;
     if(arrayindex >= NUM_SSIDS){arrayindex =0;}
 }
@@ -101,6 +104,7 @@ void customAttack(){
     if(++numSSID >= numSSIDLimit){numSSID =0;}
 }
 
+//initializing menu option and/or custom network spam
 void initAttack(){
     Serial.println("\nBeacon Spam Menu:\n");
     Serial.println("1: Default spam with ssids from file.");

