@@ -9,7 +9,7 @@ extern "C" {
 }
 
 #define NUM_CHANNELS 3
-#define NUM_SSIDS 10 // change this to reflect the length of ssids array
+#define NUM_SSIDS 6 // change this to reflect the length of ssids array
 #define WPA2 false
 
 

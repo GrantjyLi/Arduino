@@ -1,7 +1,13 @@
 
 #include "BeaconSpam.h"
 const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
-const char* spam_SSIDS[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+const char* spam_SSIDS[] = {
+  "1) Never gonna give you Up", 
+  "2)Never gonna let you Down", 
+  "3)Never gonna run around and desert you", 
+  "4)Never gonna make you cry", 
+  "5)Never gonna say goodbye", 
+  "6)Never gonna tell a lie, or hurt you"};
 
 
     //beacon packet header
@@ -116,7 +122,7 @@ void initAttack(){
     if(menuChoice == 2){
         Serial.print("Enter Custom SSID to spam: ");
         while (!Serial.available()){}
-        customSSID = Serial.readStringUntil('\n');
+        customSSID = Serial.readStringUntil('\0');
 
         Serial.print("# of networks spammed: ");
         while (!Serial.available()){}
