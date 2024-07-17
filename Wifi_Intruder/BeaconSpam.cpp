@@ -3,11 +3,13 @@
 const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
 const char* spam_SSIDS[] = {
   "1) Never gonna give you Up", 
-  "2)Never gonna let you Down", 
-  "3)Never gonna run around and desert you", 
-  "4)Never gonna make you cry", 
-  "5)Never gonna say goodbye", 
-  "6)Never gonna tell a lie, or hurt you"};
+  "2) Never gonna let you Down", 
+  "3) Never gonna run around",
+  "4) And desert you", 
+  "5) Never gonna make you cry", 
+  "6) Never gonna say goodbye", 
+  "7) Never gonna tell a lie",
+  "8) Or hurt you"};
 
 
     //beacon packet header
