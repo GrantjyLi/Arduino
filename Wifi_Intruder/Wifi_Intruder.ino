@@ -4,6 +4,7 @@
 #include "NetworkList.h"
 #include "FirebaseCom.h"
 #include "BeaconSpam.h"
+#include "Deauther.h"
 
 using namespace View;
 using namespace WebPortal;
