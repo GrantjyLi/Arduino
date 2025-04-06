@@ -1,5 +1,6 @@
 
 #include "BeaconSpam.h"
+
 const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
 const char* spam_SSIDS[] = {
   "1) Never gonna give you Up", 
@@ -118,8 +119,7 @@ void initAttack(){
     Serial.println("1: Default spam with ssids from file.");
     Serial.println("2: Custom SSID to spam.");
 
-    while (!Serial.available()){}
-    menuChoice = Serial.parseInt();
+    View::getIntInput(menuChoice);
 
     if(menuChoice == 2){
         Serial.print("Enter Custom SSID to spam: ");

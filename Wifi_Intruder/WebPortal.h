@@ -3,8 +3,6 @@
 #ifndef WEBPORTAL_H
 #define WEBPORTAL_H
 
-#include "FirebaseCom.h"
-
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
 
@@ -20,8 +18,6 @@
 extern ESP8266WebServer server;
 extern String SSID;
 extern bool internetConnection;
-
-using namespace FirebaseCom;
 
 namespace WebPortal{
     String getHTML(String&);

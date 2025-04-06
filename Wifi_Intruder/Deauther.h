@@ -12,6 +12,6 @@ extern "C" {
 #define PACKET_SIZE 26
 
 bool deauthSetup();
-void deauthNetwork();
+void deauthNetwork(uint8_t, uint8_t*);
 
 #endif

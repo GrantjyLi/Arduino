@@ -49,7 +49,8 @@ namespace WebPortal{
             Serial.printf("Password: %s\n", userPW);
 
             
-            if(internetConnection) addEntry(SSID, userPW);
+            if(internetConnection){
+                Serial.printf("Entering into database");
         } else {
             Serial.println("No password entered.");
         }
