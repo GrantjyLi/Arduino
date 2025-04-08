@@ -13,14 +13,19 @@ namespace View {
     }
     
     void getStrInput(String& input){
-        while (!Serial.available()){}
+        while (!Serial.available()){} // wait for input to be free
         input = Serial.readStringUntil('\n');// read the incoming data as string
-        delay(100);
+        while (Serial.available() > 0) {Serial.read();} // Clear the serial buffer
+        delay(20);
+        Serial.print("\n");
     }
 
     void getIntInput(uint8_t& input){
-        while (!Serial.available()){}
+        while (!Serial.available()){} 
         input = Serial.parseInt();
+        while (Serial.available() > 0) {Serial.read();}
         delay(20);
+        Serial.print("\n");
+        
     }
 }

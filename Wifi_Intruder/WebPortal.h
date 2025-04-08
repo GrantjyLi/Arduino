@@ -16,7 +16,6 @@
 #define HOST_PASSWORD "hotspot4Grant"
 
 extern ESP8266WebServer server;
-extern String SSID;
 extern bool internetConnection;
 
 namespace WebPortal{

@@ -57,7 +57,7 @@ void NetworkList::printNetworks(){
     String offset;
     for(uint8_t i =0 ; i<size; i++){
         offset = i+1 >= 10 ? "  " : "   ";
-        Serial.printf("#%d%s", i+1, offset);
+        Serial.printf("#%d%s", i+1, offset.c_str());
 
         Serial.printf("%s", getSSID(i)->c_str());
 
@@ -68,7 +68,7 @@ void NetworkList::printNetworks(){
         Serial.printf("%s%s", getBSSIDstr(i)->c_str(), "   ");
 
         offset = getChannel(i) >= 10 ? "    " : "     ";
-        Serial.printf("   %d%s", getChannel(i), offset);
+        Serial.printf("   %d%s", getChannel(i), offset.c_str());
 
         Serial.printf("%.2f", getRSSI(i));
         Serial.println("");

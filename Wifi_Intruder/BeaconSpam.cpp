@@ -123,12 +123,10 @@ void initAttack(){
 
     if(menuChoice == 2){
         Serial.print("Enter Custom SSID to spam: ");
-        while (!Serial.available()){}
-        customSSID = Serial.readStringUntil('\0');
+        View::getStrInput(customSSID);
 
         Serial.print("# of networks spammed: ");
-        while (!Serial.available()){}
-        numSSIDLimit = Serial.parseInt();
+        View::getIntInput(numSSIDLimit);
     }
 }
 

@@ -19,6 +19,7 @@ bool internetConnection = false;
 bool attacking = false; //if any attacks are happening
 bool beaconSpamAttack = false;
 bool deauthAttack = false;
+uint8_t intInput = 0;
 
 void setup() {
 
@@ -37,7 +38,8 @@ void setup() {
     Serial.print("Enter Mode: ");
     
     while (!Serial.available()){}
-    internetConnection = Serial.parseInt() == 1;
+    View::getIntInput(intInput);
+    internetConnection = intInput == 1;
 
     if(internetConnection){
         //connecting to internet
@@ -50,18 +52,17 @@ void setup() {
         }
         Serial.println("Connected To Internet");
 
-        firebaseSetup();
     }
     delay(10);
 }
 
 
 void loop(){
-    main();
+    mainMenu();
     delay(10);
 }
 
-void main(){
+void mainMenu(){
     if (!attacking){
 
         View::printInstruction();
@@ -76,7 +77,7 @@ void main(){
                 evilTwin();
                 break;
             case 3:
-                createAP();
+                createCustomAP();
                 attacking = true;
                 break;
             case 4:
@@ -92,7 +93,7 @@ void main(){
                 }
                 break;
             case 6: // control attacks
-            break;
+              break;
             default:
                 Serial.println("Enter a Valid Answer: ");
                 View::printInstruction();
@@ -112,7 +113,7 @@ void main(){
 uint8_t getNetworkIndex(){
     if(networks.getSize() == 0){
         Serial.println("No networks observed.");
-        return;
+        return -1;
     }
 
     Serial.print("\nWhich network # to mimic: ");
@@ -154,15 +155,18 @@ void findNewNetworks(){
 void evilTwin(){
     uint8_t networkNum = getNetworkIndex();
     if(networkNum != -1){
-        custom_AP_SSID = *networks.getSSID(networkNum-1);
+        custom_AP_SSID = *networks.getSSID(networkNum);
         attacking = createAP();
     }
 }
 
-bool createAP(){
+void createCustomAP(){
     Serial.print("Enter custom SSID: ");
     View::getStrInput(custom_AP_SSID);
+    attacking = createAP();
+}
 
+bool createAP(){
     Serial.print("Creating network: ");
     Serial.println(custom_AP_SSID);
     
