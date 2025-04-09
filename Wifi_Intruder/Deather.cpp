@@ -12,12 +12,6 @@ uint8_t deauthPacket[PACKET_SIZE] = {
 };
 
 bool deauthSetup(){
-  // set wifi modes
-  if(!WiFi.mode(WIFI_STA)){
-    Serial.println("Cannot set station mode");
-    return false;
-  }
-
   wifi_promiscuous_enable(1);
 
   uint8_t targetBSSID[MAC_ADDR_LEN] = {0};

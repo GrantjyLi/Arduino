@@ -50,11 +50,6 @@ bool beaconSpamSetup() {
         return false;
     }
 
-    if(!wifi_set_opmode(STATION_MODE)){
-        Serial.println("Cannot set station mode");
-        return false;
-    }
-
     wifi_promiscuous_enable(1); 
 
     arrayindex = 0;
@@ -83,7 +78,6 @@ void sendBeacon(const char* ssid){
     for(int k=0; k< 6; k++){
         beaconPacket[10 + k] = beaconPacket[16 + k] = random(256);
     }
-
     //looping through every wifi channel
     for(int i=0; i < NUM_CHANNELS ; i++){
         wifi_set_channel(channels[i]);
@@ -94,23 +88,23 @@ void sendBeacon(const char* ssid){
             packetsSent += wifi_send_pkt_freedom(beaconPacket, packetSize, 0) == 0;  
             delay(1);
         }
-        
     }
-    
 }
 
 void defaultAttack(){
-    sendBeacon(spam_SSIDS[arrayindex]);
-    arrayindex++;
-    if(arrayindex >= NUM_SSIDS){arrayindex =0;}
+    while (true){
+      sendBeacon(spam_SSIDS[arrayindex]);
+      arrayindex = (arrayindex + 1) % NUM_SSIDS;
+    }
 }
 
 void customAttack(){
     String newSSID = customSSID + " ";
     newSSID += numSSID;
-    sendBeacon(&newSSID[0]);
-    
-    if(++numSSID >= numSSIDLimit){numSSID =0;}
+    while (true){
+      sendBeacon(&newSSID[0]);
+      arrayindex = (arrayindex + 1) % NUM_SSIDS;
+    }
 }
 
 //initializing menu option and/or custom network spam

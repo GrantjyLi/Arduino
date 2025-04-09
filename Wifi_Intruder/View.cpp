@@ -17,7 +17,7 @@ namespace View {
         input = Serial.readStringUntil('\n');// read the incoming data as string
         while (Serial.available() > 0) {Serial.read();} // Clear the serial buffer
         delay(20);
-        Serial.print("\n");
+        Serial.printf("\nInput Entered: %s\n", input.c_str());
     }
 
     void getIntInput(uint8_t& input){
@@ -25,7 +25,7 @@ namespace View {
         input = Serial.parseInt();
         while (Serial.available() > 0) {Serial.read();}
         delay(20);
-        Serial.print("\n");
+        Serial.printf("\nInput Entered: %d\n", input);
         
     }
 }

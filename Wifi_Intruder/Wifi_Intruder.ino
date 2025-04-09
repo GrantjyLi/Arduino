@@ -17,27 +17,24 @@ String custom_AP_SSID;
 bool apStarted = false; // to see if there is a point running
 bool internetConnection = false;
 bool attacking = false; //if any attacks are happening
-bool beaconSpamAttack = false;
-bool deauthAttack = false;
 uint8_t intInput = 0;
 
 void setup() {
-
-    WiFi.mode(WIFI_AP_STA);
     WiFi.disconnect(); // Disconnect from any previously connected network
+    if (! WiFi.mode(WIFI_AP_STA)){
+      Serial.println("Wifi mode couldn't be setup properly");
+    }
 
-    delay(1000); // Wait for the module to disconnect
+    delay(500); // Wait for the module to disconnect
 
     Serial.begin(115200);
     Serial.flush();
 
-
-    Serial.println("\n");//need online mode for firebase
+    Serial.print("\n");
     Serial.println("1: Online Mode");
     Serial.println("2: Offline Mode");
     Serial.print("Enter Mode: ");
-    
-    while (!Serial.available()){}
+  
     View::getIntInput(intInput);
     internetConnection = intInput == 1;
 
@@ -81,16 +78,10 @@ void mainMenu(){
                 attacking = true;
                 break;
             case 4:
-                if(beaconSpamSetup()){
-                    beaconSpamAttack = true;
-                    attacking = true;
-                }
+                handleBeaconSpam();
                 break;
             case 5:
-                if(deauthSetup()){
-                    deauthAttack = true;
-                    attacking = true;
-                }
+                handleDeauthAttack();
                 break;
             case 6: // control attacks
               break;
@@ -100,8 +91,6 @@ void mainMenu(){
                 break;
         }
     } else{
-        if(beaconSpamAttack) handleBeaconSpam();
-        if(deauthAttack) handleDeauthAttack();
 
         if(apStarted){
             dnsServer.processNextRequest();
@@ -110,18 +99,18 @@ void mainMenu(){
     }
 }
 
-uint8_t getNetworkIndex(){
+int8_t getNetworkIndex(){
     if(networks.getSize() == 0){
         Serial.println("No networks observed.");
         return -1;
     }
 
-    Serial.print("\nWhich network # to mimic: ");
+    Serial.print("\nEnter network #: ");
     uint8_t networkNum;
     View::getIntInput(networkNum);
-    Serial.printf("\nChosing network #%d\n", networkNum);
 
-    if(networkNum >= 0 && networkNum <= networks.getSize()){
+    if(networkNum > 0 && networkNum <= networks.getSize()){
+      Serial.printf("\nChoosing network #%d: %s\n", networkNum, networks.getNetwork(networkNum-1)->getSSID()->c_str());
         return networkNum -1;
     }else{
         Serial.println("Invalid network number.");
@@ -131,15 +120,14 @@ uint8_t getNetworkIndex(){
 
 void findNewNetworks(){
     Serial.println("\nScanning for available networks:");
-
-    uint8_t newNumNetworks = WiFi.scanNetworks();
+    int8_t newNumNetworks = WiFi.scanNetworks();
     String SSID;
     String BSSIDstr;
     uint8_t BSSID[6];
     float RSSI;
     uint8_t channel;
 
-    for (uint8_t i = 0; i < newNumNetworks; i++){
+    for (int8_t i = 0; i < newNumNetworks; i++){
         SSID = WiFi.SSID(i);
         BSSIDstr = WiFi.BSSIDstr(i);
         memcpy(BSSID, WiFi.BSSID(i), 6);
@@ -153,10 +141,12 @@ void findNewNetworks(){
 }
 
 void evilTwin(){
-    uint8_t networkNum = getNetworkIndex();
-    if(networkNum != -1){
-        custom_AP_SSID = *networks.getSSID(networkNum);
+    int8_t networkIndex = getNetworkIndex();
+    if(networkIndex != -1){
+        custom_AP_SSID = *(networks.getNetwork(networkIndex)->getSSID());
         attacking = createAP();
+    }else{
+      attacking = false;
     }
 }
 
@@ -207,12 +197,23 @@ bool createAP(){
 }
 
 void handleBeaconSpam(){
-    beaconSpam();
+  if (beaconSpamSetup()){
+      attacking = true;
+      beaconSpam();
+  } 
 }
 
 void handleDeauthAttack(){
-    uint8_t networkNum = getNetworkIndex();
-    if(networkNum != -1){
-        deauthNetwork(networks.getChannel(networkNum), networks.getBSSID(networkNum));
+    if (deauthSetup()){
+
+        int8_t networkNum = getNetworkIndex();
+
+        if(networkNum != -1){
+            attacking = true;
+            deauthNetwork(
+                networks.getNetwork(networkNum)->getChannel(), 
+                networks.getNetwork(networkNum)->getBSSID()
+            );
+        }
     }
 }
