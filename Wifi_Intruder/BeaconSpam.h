@@ -10,7 +10,6 @@ extern "C" {
 }
 
 #define NUM_CHANNELS 3
-#define NUM_SSIDS 8 // change this to reflect the length of ssids array
 #define WPA2 false
 
 bool beaconSpamSetup();

