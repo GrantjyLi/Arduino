@@ -14,9 +14,7 @@ NetworkList networks;
 
 String custom_AP_SSID;
 bool apStarted = false; // to see if there is a point running
-bool internetConnection = false;
 bool attacking = false; //if any attacks are happening
-uint8_t intInput = 0;
 
 void setup() {
     WiFi.disconnect(); // Disconnect from any previously connected network
@@ -31,7 +29,7 @@ void setup() {
     Serial.flush();
 
     Serial.print("\n");
-    Serial.println("Welcome to Wifi Intruder. Have FUN! :]\n");
+    Serial.println("Welcome to Wifi Intruder. Have FUN! :]");
 
     delay(10);
 }
@@ -82,51 +80,10 @@ void mainMenu(){
     }
 }
 
-int8_t getNetworkIndex(){
-    if(networks.getSize() == 0){
-        Serial.println("No networks observed.");
-        return -1;
-    }
-
-    Serial.print("\nEnter network #: ");
-    uint8_t networkNum;
-    View::getIntInput(networkNum);
-
-    if(networkNum > 0 && networkNum <= networks.getSize()){
-      Serial.printf("\nChoosing network #%d: %s\n", networkNum, networks.getNetwork(networkNum-1)->getSSID()->c_str());
-        return networkNum -1;
-    }else{
-        Serial.println("Invalid network number.");
-    }
-    return -1;
-}
-
-void findNewNetworks(){
-    Serial.println("\nScanning for available networks:");
-    int8_t newNumNetworks = WiFi.scanNetworks();
-    String SSID;
-    String BSSIDstr;
-    uint8_t BSSID[6];
-    float RSSI;
-    uint8_t channel;
-
-    for (int8_t i = 0; i < newNumNetworks; i++){
-        SSID = WiFi.SSID(i);
-        BSSIDstr = WiFi.BSSIDstr(i);
-        memcpy(BSSID, WiFi.BSSID(i), 6);
-        RSSI = WiFi.RSSI(i);
-        channel = WiFi.channel(i);
-
-        networks.addNetwork(SSID, BSSIDstr, BSSID, RSSI, channel);
-   
-    }
-    networks.printNetworks();
-}
-
 void evilTwin(){
     int8_t networkIndex = getNetworkIndex();
     if(networkIndex != -1){
-        custom_AP_SSID = *(networks.getNetwork(networkIndex)->getSSID());
+        custom_AP_SSID = networks[networkIndex]->SSID;
         attacking = createAP();
     }else{
       attacking = false;
@@ -148,7 +105,6 @@ bool createAP(){
         return false;
     }
     
-    //WiFi.softAP(custom_AP_SSID, AP_PASSWORD,1, false, 4)
     if (!WiFi.softAP(custom_AP_SSID)) {
         Serial.println("Failed to start AP");
         return false;
@@ -179,6 +135,47 @@ bool createAP(){
     return true;
 }
 
+int8_t getNetworkIndex(){
+    if(networks.size == 0){
+        Serial.println("No networks observed.");
+        return -1;
+    }
+
+    Serial.print("\nEnter network #: ");
+    uint8_t networkNum;
+    View::getIntInput(networkNum);
+
+    if(networkNum > 0 && networkNum <= networks.size){
+      Serial.printf("\nChoosing network #%d: %s\n", networkNum, networks[networkNum-1]->SSID.c_str());
+        return networkNum -1;
+    }else{
+        Serial.println("Invalid network number.");
+    }
+    return -1;
+}
+
+void findNewNetworks(){
+    Serial.println("\nScanning for available networks:");
+    int8_t newNumNetworks = WiFi.scanNetworks();
+    String SSID;
+    String BSSIDstr;
+    uint8_t BSSID[6];
+    float RSSI;
+    uint8_t channel;
+
+    for (int8_t i = 0; i < newNumNetworks; i++){
+        SSID = WiFi.SSID(i);
+        BSSIDstr = WiFi.BSSIDstr(i);
+        memcpy(BSSID, WiFi.BSSID(i), 6);
+        RSSI = WiFi.RSSI(i);
+        channel = WiFi.channel(i);
+
+        networks.addNetwork(SSID, BSSIDstr, BSSID, RSSI, channel);
+   
+    }
+    networks.printNetworks();
+}
+
 void handleBeaconSpam(){
     attacking = true;
     beaconSpam();
@@ -190,8 +187,8 @@ void handleDeauthAttack(){
     if(networkNum != -1){
         attacking = true;
         deauthNetwork(
-            networks.getNetwork(networkNum)->getChannel(), 
-            networks.getNetwork(networkNum)->getBSSID()
+            networks.getNetwork(networkNum)->channel, 
+            networks.getNetwork(networkNum)->BSSID
         );
     }
 }

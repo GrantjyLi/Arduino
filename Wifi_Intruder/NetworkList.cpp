@@ -5,8 +5,12 @@ NetworkList::~NetworkList(){
     for(int8_t i = 0; i< size; i++){delete networks[i];}
 }
 
-int8_t NetworkList::getSize(){
-    return size;
+Network* NetworkList::operator[](size_t index) {
+    if (index < size) {
+        return networks[index]; // Return a pointer to the Network object
+    }
+    Serial.println("Invalid index.");
+    return nullptr; // Return nullptr if index is out of bounds
 }
 
 bool NetworkList::addNetwork(String& SSID, String& BSSIDstr, uint8_t* BSSID ,float RSSI, uint8_t channel){
@@ -18,7 +22,7 @@ bool NetworkList::addNetwork(String& SSID, String& BSSIDstr, uint8_t* BSSID ,flo
 
 bool NetworkList::isNew(uint8_t* BSSID){
     for(uint8_t i=0; i< size; i++){
-        if(memcmp(networks[i]->getBSSID(), BSSID, MAC_ADDR_LEN) == 0){
+        if(memcmp(networks[i]->BSSID, BSSID, MAC_ADDR_LEN) == 0){
             return false;
         }
     }
@@ -41,11 +45,12 @@ void NetworkList::printNetworks(){
     String offset;
     for(uint8_t i =0 ; i<size; i++){
         Network* network = networks[i];
-        String* SSID = network->getSSID();
-        String* BSSIDstr = network->getBSSIDstr();
-        uint8_t* BSSID = network->getBSSID();
-        float RSSI = network->getRSSI();
-        uint8_t channel = network->getChannel();
+
+        String* SSID = &(network->SSID);
+        String* BSSIDstr = &(network->BSSIDstr);
+        uint8_t* BSSID = network->BSSID;
+        float RSSI = network->RSSI;
+        uint8_t channel = network->channel;
 
         offset = i+1 >= 10 ? "  " : "   ";
         Serial.printf("#%d%s", i+1, offset.c_str());

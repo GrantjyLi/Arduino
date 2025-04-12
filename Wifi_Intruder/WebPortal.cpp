@@ -50,14 +50,9 @@ namespace WebPortal{
             Serial.printf("SSID: %s\n", SSID.c_str());
             Serial.printf("Password: %s\n", userPW.c_str());
 
-            
-            if(internetConnection){
-                Serial.printf("Entering into database");
-            } else {
-                Serial.println("No password entered.");
-            }
-
-          server.send(200, "text/html", getHTML());
+            server.send(200, "text/html", getHTML());
         }
     }
 } 
+
+

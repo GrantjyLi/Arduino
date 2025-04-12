@@ -10,14 +10,14 @@ class NetworkList{
     public:
         NetworkList();
         ~NetworkList();
-        int8_t getSize();
+        int8_t size;
+        Network* operator[](size_t index);
         bool addNetwork(String&, String&, uint8_t*,  float, uint8_t);
         bool isNew(uint8_t*);
         Network* getNetwork(uint8_t index);
         void printNetworks();
 
     private:
-        int8_t size;
         Network* networks[MAXSSIDS];
 };
 
