@@ -18,8 +18,4 @@ class Network{
 
 };
 
-    
-
-
-
 #endif

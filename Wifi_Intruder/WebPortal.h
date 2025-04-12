@@ -9,13 +9,18 @@
 #define DEFAULT_PORT 80
 #define DNS_PORT 53
 
+extern IPAddress local_IP;
+extern IPAddress subnet;
+
 extern ESP8266WebServer server;
+extern DNSServer dnsServer;
 
 namespace WebPortal{
     String getHTML(String&);
-    void handleConnect();
-    void handleSubmit();
-    
+    void handleConnect(String&);
+    void handleSubmit(String&);
 }
+
+bool createAP(String = "Wifi Intruder AP");
 
 #endif

