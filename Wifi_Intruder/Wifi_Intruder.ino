@@ -2,8 +2,7 @@
 #include "View.h"
 #include "WebPortal.h"
 #include "NetworkList.h"
-#include "BeaconSpam.h"
-#include "Deauther.h"
+#include "Attacks.h"
 
 IPAddress local_IP(192,168,4,22);
 IPAddress subnet(255,255,255,0);
@@ -21,7 +20,8 @@ uint8_t intInput = 0;
 
 void setup() {
     WiFi.disconnect(); // Disconnect from any previously connected network
-    if (! WiFi.mode(WIFI_AP_STA)){
+    wifi_promiscuous_enable(1);
+    if (!WiFi.mode(WIFI_AP_STA)){
       Serial.println("Wifi mode couldn't be setup properly");
     }
 
@@ -31,25 +31,8 @@ void setup() {
     Serial.flush();
 
     Serial.print("\n");
-    Serial.println("1: Online Mode");
-    Serial.println("2: Offline Mode");
-    Serial.print("Enter Mode: ");
-  
-    View::getIntInput(intInput);
-    internetConnection = intInput == 1;
+    Serial.println("Welcome to Wifi Intruder. Have FUN! :]\n");
 
-    if(internetConnection){
-        //connecting to internet
-        Serial.println("Connecting to Internet...");
-
-        WiFi.begin(HOST_SSID, HOST_PASSWORD);
-        while (WiFi.status() != WL_CONNECTED){
-            Serial.println(".");
-            delay(1000);
-        }
-        Serial.println("Connected To Internet");
-
-    }
     delay(10);
 }
 
@@ -197,23 +180,18 @@ bool createAP(){
 }
 
 void handleBeaconSpam(){
-  if (beaconSpamSetup()){
-      attacking = true;
-      beaconSpam();
-  } 
+    attacking = true;
+    beaconSpam();
 }
 
 void handleDeauthAttack(){
-    if (deauthSetup()){
+    int8_t networkNum = getNetworkIndex();
 
-        int8_t networkNum = getNetworkIndex();
-
-        if(networkNum != -1){
-            attacking = true;
-            deauthNetwork(
-                networks.getNetwork(networkNum)->getChannel(), 
-                networks.getNetwork(networkNum)->getBSSID()
-            );
-        }
+    if(networkNum != -1){
+        attacking = true;
+        deauthNetwork(
+            networks.getNetwork(networkNum)->getChannel(), 
+            networks.getNetwork(networkNum)->getBSSID()
+        );
     }
 }
