@@ -1,12 +1,11 @@
-#include"WebPortal.h"
+#include"Access_Point.h"
 
 IPAddress local_IP(192,168,4,22);
 IPAddress subnet(255,255,255,0);
-
 ESP8266WebServer server(DEFAULT_PORT); // Define the variable
 DNSServer dnsServer; // Define the variable
 
-namespace WebPortal{
+namespace Access_Point{
     String getHTML(const String& SSID){
         String HTMLTemplate = 
         R"rawliteral(<!DOCTYPE html>
@@ -85,11 +84,11 @@ bool createAP(String custom_AP_SSID){
     Serial.println(WiFi.softAPIP());
 
     server.onNotFound([custom_AP_SSID]() {
-        WebPortal::handleConnect(custom_AP_SSID);
+        Access_Point::handleConnect(custom_AP_SSID);
     });
 
     server.on("/submit", [custom_AP_SSID]() {
-        WebPortal::handleSubmit(custom_AP_SSID);
+        Access_Point::handleSubmit(custom_AP_SSID);
     });
     //server.onNotFound(handleNotFound);
     server.begin();

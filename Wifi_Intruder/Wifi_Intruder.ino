@@ -1,14 +1,14 @@
 #include <ESP8266WiFi.h>
 #include "View.h"
-#include "WebPortal.h"
+#include "Access_Point.h"
 #include "NetworkList.h"
 #include "Attacks.h"
 
 NetworkList networks;
 
 String custom_AP_SSID;
-bool apStarted = false; // to see if there is a point running
-bool attacking = false; //if any attacks are happening
+bool apStarted = false; // if any access points are currently running
+bool attacking = false; // if any attacks are currently running
 
 void setup() {
     WiFi.disconnect(); // Disconnect from any previously connected network
@@ -117,6 +117,7 @@ void handleEvilTwin(){
     if(networkIndex != -1){
         custom_AP_SSID = networks[networkIndex]->SSID;
         apStarted = createAP(custom_AP_SSID);
+        attacking = apStarted;
     }
 }
 
@@ -124,6 +125,7 @@ void handleCustomAP(){
     Serial.print("Enter custom SSID: ");
     View::getStrInput(custom_AP_SSID);
     apStarted = createAP(custom_AP_SSID);
+    attacking = apStarted;
 }
 
 void handleBeaconSpam(){

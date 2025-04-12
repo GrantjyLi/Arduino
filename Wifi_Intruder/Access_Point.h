@@ -1,7 +1,7 @@
 //for dealing with web page hosting and firebase interaction
 
-#ifndef WEBPORTAL_H
-#define WEBPORTAL_H
+#ifndef ACCESS_POINT_H
+#define ACCESS_POINT_H
 
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
@@ -11,11 +11,10 @@
 
 extern IPAddress local_IP;
 extern IPAddress subnet;
-
 extern ESP8266WebServer server;
 extern DNSServer dnsServer;
 
-namespace WebPortal{
+namespace Access_Point{
     String getHTML(String&);
     void handleConnect(String&);
     void handleSubmit(String&);
