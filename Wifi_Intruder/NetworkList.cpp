@@ -20,6 +20,13 @@ bool NetworkList::addNetwork(String& SSID, String& BSSIDstr, uint8_t* BSSID ,flo
     return true;
 }
 
+bool NetworkList::addNetwork(Network* network){
+    if(size == MAXSSIDS || !isNew(network->BSSID)){return false;}
+    networks[size] = network;
+    size++;
+    return true;
+}
+
 bool NetworkList::isNew(uint8_t* BSSID){
     for(uint8_t i=0; i< size; i++){
         if(memcmp(networks[i]->BSSID, BSSID, MAC_ADDR_LEN) == 0){
