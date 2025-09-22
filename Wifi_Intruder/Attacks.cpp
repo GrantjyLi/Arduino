@@ -4,16 +4,18 @@
 #define NUM_CHANNELS 3
 const uint8_t channels[] = {1, 6, 11}; // commonly used wifi channels on 2.4ghz
 
-#define DEFAULT_NUM_SSIDS 8
+#define DEFAULT_NUM_SSIDS 9
 char* default_Spam_SSIDs[] = {
-  "1) Never gonna give you Up", 
-  "2) Never gonna let you Down", 
-  "3) Never gonna run around",
-  "4) And desert you", 
-  "5) Never gonna make you cry", 
-  "6) Never gonna say goodbye", 
-  "7) Never gonna tell a lie",
-  "8) Or hurt you"};
+  "1) Rock Bottom", 
+  "2) Graveyard Shift", 
+  "3) Pizza Delivery",
+  "4) The Camping Episode", 
+  "5) SB-129", 
+  "6) Chocolate with Nuts", 
+  "7) Bubble Stand",
+  "8) The Idiot Box",
+  "9) haha fuck you idiot"
+};
 
 
 //beacon packet header

